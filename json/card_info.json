@@ -1,0 +1,25 @@
+{
+    "cards": [
+        {
+            "idx": 0,
+            "chance_value": 25,
+            "attack_value": 0,
+            "name": "I feel lucky",
+            "description": "I have a good feeling about this"
+        },
+        {
+            "idx": 1,
+            "chance_value": 0,
+            "attack_value": 1,
+            "name": "Baby one more time",
+            "description": "I feel like I should attack one more time!"
+        },
+        {
+            "idx": 2,
+            "chance_value": -10,
+            "attack_value": 2,
+            "name": "Double trouble",
+            "description": "I feel like I should attack twice more!"
+        }
+    ]
+}
