@@ -80,11 +80,14 @@ class _GameInterfaceState extends State<GameInterface> {
                   }),
                   StatusBar(
                       value: remainingChances, maxValue: 5, color: Colors.blue),
-                  _buildStatCard('Chance Percent', chancePercent, (newValue) {
+                  _buildStatCard('Chance Percent', max(0, chancePercent),
+                      (newValue) {
                     setState(() => chancePercent = newValue);
                   }),
                   StatusBar(
-                      value: chancePercent, maxValue: 100, color: Colors.green),
+                      value: max(0, chancePercent),
+                      maxValue: 100,
+                      color: Colors.green),
                   _buildStatCard('Attack Number', attackNum, (newValue) {
                     setState(() => attackNum = newValue);
                   }),
