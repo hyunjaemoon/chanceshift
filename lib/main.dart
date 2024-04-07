@@ -1,8 +1,8 @@
 import 'dart:math';
 
 import 'package:chanceshfit/card_list.dart';
+import 'package:chanceshfit/ui.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 void main() {
   runApp(MyApp());
@@ -14,6 +14,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'ChanceShift',
       theme: ThemeData(
+        fontFamily: 'VT323',
         brightness: Brightness.dark,
         primaryColor: Colors.blueGrey,
       ),
@@ -65,18 +66,23 @@ class _GameInterfaceState extends State<GameInterface> {
             Expanded(
               child: ListView(
                 children: [
-                  _buildStatCard('Chance Percent', chancePercent, (newValue) {
-                    setState(() => chancePercent = newValue);
-                  }),
-                  _buildStatCard('Attack Number', attackNum, (newValue) {
-                    setState(() => attackNum = newValue);
-                  }),
                   _buildStatCard('Enemy HP', enemyHp, (newValue) {
                     setState(() => enemyHp = newValue);
                   }),
+                  StatusBar(value: enemyHp, maxValue: 5, color: Colors.red),
                   _buildStatCard('Remaining Chances', remainingChances,
                       (newValue) {
                     setState(() => remainingChances = newValue);
+                  }),
+                  StatusBar(
+                      value: remainingChances, maxValue: 5, color: Colors.blue),
+                  _buildStatCard('Chance Percent', chancePercent, (newValue) {
+                    setState(() => chancePercent = newValue);
+                  }),
+                  StatusBar(
+                      value: chancePercent, maxValue: 100, color: Colors.green),
+                  _buildStatCard('Attack Number', attackNum, (newValue) {
+                    setState(() => attackNum = newValue);
                   }),
                   Wrap(
                     spacing: 8.0,
@@ -97,10 +103,7 @@ class _GameInterfaceState extends State<GameInterface> {
                 ],
               ),
             ),
-            ElevatedButton(
-              onPressed: _performAttack,
-              child: Text('Attack!'),
-            ),
+            PushButton(onPressed: _performAttack),
           ],
         ),
       ),

@@ -9,14 +9,14 @@
         },
         {
             "idx": 1,
-            "chance_value": 0,
+            "chance_value": -25,
             "attack_value": 1,
-            "name": "Baby one more time",
+            "name": "Just one more time",
             "description": "I feel like I should attack one more time!"
         },
         {
             "idx": 2,
-            "chance_value": -10,
+            "chance_value": -30,
             "attack_value": 2,
             "name": "Double trouble",
             "description": "I feel like I should attack twice more!"

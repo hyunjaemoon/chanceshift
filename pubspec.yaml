@@ -90,3 +90,7 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
+  fonts:
+    - family: VT323
+      fonts:
+        - asset: fonts/VT323-Regular.ttf
