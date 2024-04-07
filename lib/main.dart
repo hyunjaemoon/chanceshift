@@ -8,6 +8,8 @@ void main() {
   runApp(MyApp());
 }
 
+const defaultTextStyle = TextStyle(fontSize: 25);
+
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -58,7 +60,7 @@ class _GameInterfaceState extends State<GameInterface> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('ChanceShift v0.1'),
+        title: Text('ChanceShift v0.1', style: defaultTextStyle),
       ),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -101,12 +103,12 @@ class _GameInterfaceState extends State<GameInterface> {
                             builder: (context) => CardListScreen()),
                       );
                     },
-                    child: Text('View Cards'),
+                    child: Text('View Cards', style: defaultTextStyle),
                   ),
+                  PushButton(onPressed: _performAttack),
                 ],
               ),
             ),
-            PushButton(onPressed: _performAttack),
           ],
         ),
       ),
@@ -116,7 +118,7 @@ class _GameInterfaceState extends State<GameInterface> {
   Widget _buildStatCard(String label, int value, ValueChanged<int> onChanged) {
     return Card(
       child: ListTile(
-        title: Text('$label: $value'),
+        title: Text('$label: $value', style: defaultTextStyle),
         trailing: IconButton(
           icon: Icon(Icons.add),
           onPressed: () {
@@ -136,7 +138,8 @@ class _GameInterfaceState extends State<GameInterface> {
           bool isSelected = cardIndices.contains(cards.cards[cardIndex].idx);
           return FilterChip(
             selected: isSelected,
-            label: Text(cards.cards[cardIndex].name),
+            label: Text(cards.cards[cardIndex].name,
+                style: TextStyle(fontSize: 18)),
             onSelected: (bool selected) {
               setState(() {
                 if (selected) {
@@ -176,14 +179,17 @@ class _GameInterfaceState extends State<GameInterface> {
             enemyHp -= 1;
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text('Attack Success!'),
+                content: Text('Attack Success!', style: defaultTextStyle),
                 duration: Duration(seconds: 1), // Duration can be adjusted
               ),
             );
           } else {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text('Attack Failed...'),
+                content: Text(
+                  'Attack Failed...',
+                  style: defaultTextStyle,
+                ),
                 duration: Duration(seconds: 1), // Duration can be adjusted
               ),
             );
@@ -198,7 +204,8 @@ class _GameInterfaceState extends State<GameInterface> {
         builder: (context) {
           return AlertDialog(
             title: Text('You win!'),
-            content: Text('You defeated the enemy!'),
+            content:
+                Text('You defeated the enemy!', style: TextStyle(fontSize: 18)),
             actions: <Widget>[
               TextButton(
                 onPressed: () {
@@ -217,7 +224,8 @@ class _GameInterfaceState extends State<GameInterface> {
         builder: (context) {
           return AlertDialog(
             title: Text('Game Over'),
-            content: Text('You ran out of chances!'),
+            content:
+                Text('You ran out of chances!', style: TextStyle(fontSize: 18)),
             actions: <Widget>[
               TextButton(
                 onPressed: () {
