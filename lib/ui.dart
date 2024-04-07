@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
 class PushButton extends StatefulWidget {
   final VoidCallback onPressed;
@@ -138,5 +139,19 @@ class _StatusBarPainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) {
     return oldDelegate != this;
+  }
+}
+
+class SwordIconsRow extends StatelessWidget {
+  final int numIcons;
+
+  SwordIconsRow({required this.numIcons});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: List.generate(numIcons, (index) => Icon(MdiIcons.sword)),
+    );
   }
 }

@@ -56,7 +56,7 @@ class _GameInterfaceState extends State<GameInterface> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('ChanceShift'),
+        title: Text('ChanceShift v0.1'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -84,6 +84,7 @@ class _GameInterfaceState extends State<GameInterface> {
                   _buildStatCard('Attack Number', attackNum, (newValue) {
                     setState(() => attackNum = newValue);
                   }),
+                  SwordIconsRow(numIcons: attackNum),
                   Wrap(
                     spacing: 8.0,
                     children:
