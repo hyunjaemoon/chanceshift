@@ -13,16 +13,12 @@ Before you start, ensure you have the following installed on your system:
 ## Step 1: Clone the Repository
 Open a terminal and run the following command to clone the GitHub repository:
 
-    git clone https://github.com/your-username/your-project-name.git
-
-Replace `https://github.com/your-username/your-project-name.git` with the actual URL of your GitHub repository.
+    git clone https://github.com/hyunjaemoon/chanceshift.git
 
 ## Step 2: Navigate to the Project Directory
 Change the directory to the project folder by executing:
 
-    cd your-project-name
-
-Replace `your-project-name` with the name of the folder that was created when you cloned the repo.
+    cd chanceshift
 
 ## Step 3: Install Dependencies
 In the project directory, run the following command to fetch and install all the necessary dependencies:
