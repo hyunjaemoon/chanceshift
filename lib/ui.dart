@@ -100,7 +100,43 @@ class StatusBar extends StatefulWidget {
   _StatusBarState createState() => _StatusBarState();
 }
 
-class _StatusBarState extends State<StatusBar> {
+class _StatusBarState extends State<StatusBar>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _animationController;
+  late Animation<double> _animation;
+
+  @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController(
+      duration:
+          Duration(milliseconds: 300), // Animation duration of 300 milliseconds
+      vsync: this,
+    );
+    _animation = Tween<double>(
+      begin: widget.value / widget.maxValue,
+      end: widget.value / widget.maxValue,
+    ).animate(_animationController);
+  }
+
+  @override
+  void didUpdateWidget(covariant StatusBar oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.value != oldWidget.value) {
+      _animation = Tween<double>(
+        begin: _animation.value,
+        end: widget.value / widget.maxValue,
+      ).animate(_animationController)
+        ..addListener(() {
+          setState(
+              () {}); // Calls setState every time the animation value changes
+        });
+      _animationController
+          .reset(); // Reset the controller and then start the animation
+      _animationController.forward();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -108,11 +144,18 @@ class _StatusBarState extends State<StatusBar> {
       height: widget.height,
       child: CustomPaint(
         painter: _StatusBarPainter(
-          valuePercentage: widget.value / widget.maxValue,
+          valuePercentage: _animation.value,
           color: widget.color,
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _animationController
+        .dispose(); // Clean up the controller when the widget is disposed
+    super.dispose();
   }
 }
 

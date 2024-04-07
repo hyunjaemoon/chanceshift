@@ -36,6 +36,8 @@ class _GameInterfaceState extends State<GameInterface> {
   List<int> cardIndices = [];
   Future<CardList>? cardsFuture;
 
+  bool _isPerformingAttack = false;
+
   void reset() {
     setState(() {
       chancePercent = 50;
@@ -159,9 +161,16 @@ class _GameInterfaceState extends State<GameInterface> {
   }
 
   void _performAttack() {
+    if (_isPerformingAttack) return;
+
+    setState(() {
+      _isPerformingAttack = true;
+    });
+
     // Dummy logic for an attack
     if (remainingChances > 0 && enemyHp > 0) {
       setState(() {
+        remainingChances--;
         for (int i = 0; i < attackNum; i++) {
           if (chancePercent >= 100 || chancePercent >= Random().nextInt(100)) {
             enemyHp -= 1;
@@ -180,7 +189,6 @@ class _GameInterfaceState extends State<GameInterface> {
             );
           }
         }
-        remainingChances--;
       });
     }
     // Perform other game logic like checking for win/lose conditions
@@ -223,5 +231,8 @@ class _GameInterfaceState extends State<GameInterface> {
         },
       );
     }
+    setState(() {
+      _isPerformingAttack = false;
+    });
   }
 }
