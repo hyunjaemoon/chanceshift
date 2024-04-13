@@ -4,9 +4,10 @@ import 'package:material_design_icons_flutter/material_design_icons_flutter.dart
 class PushButton extends StatefulWidget {
   final VoidCallback onPressed;
 
-  PushButton({required this.onPressed});
+  const PushButton({super.key, required this.onPressed});
 
   @override
+  // ignore: library_private_types_in_public_api
   _PushButtonState createState() => _PushButtonState();
 }
 
@@ -35,10 +36,10 @@ class _PushButtonState extends State<PushButton> {
       child: Transform.scale(
         scale: isPressed ? 0.95 : 1.0,
         child: Container(
-          padding: EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(16.0),
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            gradient: RadialGradient(
+            gradient: const RadialGradient(
               colors: [
                 Color(0xFF4B79A1),
                 Color(0xFF283E51),
@@ -49,7 +50,7 @@ class _PushButtonState extends State<PushButton> {
                 : [
                     BoxShadow(
                       color: Colors.black.withOpacity(0.4),
-                      offset: Offset(0, 4),
+                      offset: const Offset(0, 4),
                       blurRadius: 4.0,
                     ),
                   ],
@@ -63,7 +64,7 @@ class _PushButtonState extends State<PushButton> {
                 style: BorderStyle.solid,
               ),
             ),
-            child: Center(
+            child: const Center(
               child: Text(
                 'Attack',
                 style: TextStyle(
@@ -88,15 +89,16 @@ class StatusBar extends StatefulWidget {
   final double height;
 
   const StatusBar({
-    Key? key,
+    super.key,
     required this.value,
     required this.maxValue,
     this.color = Colors.green,
     this.width = 200,
     this.height = 30,
-  }) : super(key: key);
+  });
 
   @override
+  // ignore: library_private_types_in_public_api
   _StatusBarState createState() => _StatusBarState();
 }
 
@@ -109,8 +111,8 @@ class _StatusBarState extends State<StatusBar>
   void initState() {
     super.initState();
     _animationController = AnimationController(
-      duration:
-          Duration(milliseconds: 300), // Animation duration of 300 milliseconds
+      duration: const Duration(
+          milliseconds: 300), // Animation duration of 300 milliseconds
       vsync: this,
     );
     _animation = Tween<double>(
@@ -139,7 +141,7 @@ class _StatusBarState extends State<StatusBar>
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return SizedBox(
       width: widget.width,
       height: widget.height,
       child: CustomPaint(
@@ -188,7 +190,7 @@ class _StatusBarPainter extends CustomPainter {
 class SwordIconsRow extends StatelessWidget {
   final int numIcons;
 
-  SwordIconsRow({required this.numIcons});
+  const SwordIconsRow({super.key, required this.numIcons});
 
   @override
   Widget build(BuildContext context) {

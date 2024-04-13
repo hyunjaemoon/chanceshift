@@ -3,7 +3,10 @@ import 'package:chanceshfit/game_interface.dart';
 import 'package:flutter/material.dart';
 
 class MenuScreen extends StatefulWidget {
+  const MenuScreen({super.key});
+
   @override
+  // ignore: library_private_types_in_public_api
   _MenuScreenState createState() => _MenuScreenState();
 }
 
@@ -17,7 +20,7 @@ class _MenuScreenState extends State<MenuScreen>
     super.initState();
     _animationController = AnimationController(
       vsync: this,
-      duration: Duration(seconds: 1),
+      duration: const Duration(seconds: 1),
     )..repeat(reverse: true);
     _animation = Tween<double>(begin: 0, end: 20).animate(_animationController);
   }
@@ -50,50 +53,50 @@ class _MenuScreenState extends State<MenuScreen>
                 height: 400,
               ),
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             ElevatedButton(
               onPressed: () {
                 // Handle Start button press
                 Navigator.push(
                   context,
                   PageRouteBuilder(
-                    transitionDuration: Duration(milliseconds: 500),
+                    transitionDuration: const Duration(milliseconds: 500),
                     pageBuilder: (context, animation, secondaryAnimation) =>
                         FadeTransition(
                       opacity: animation,
-                      child: GameInterface(),
+                      child: const GameInterface(),
                     ),
                   ),
                 );
               },
-              child: Text(
+              child: const Text(
                 'Demo Game',
                 style: TextStyle(
-                  fontSize: 24,
+                  fontSize: 30,
                   color: Colors.white,
                 ),
               ),
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             ElevatedButton(
               onPressed: () {
                 // Handle Credits button press
                 Navigator.push(
                   context,
                   PageRouteBuilder(
-                    transitionDuration: Duration(milliseconds: 500),
+                    transitionDuration: const Duration(milliseconds: 500),
                     pageBuilder: (context, animation, secondaryAnimation) =>
                         FadeTransition(
                       opacity: animation,
-                      child: CreditScreen(),
+                      child: const CreditScreen(),
                     ),
                   ),
                 );
               },
-              child: Text(
+              child: const Text(
                 'Credits',
                 style: TextStyle(
-                  fontSize: 24,
+                  fontSize: 25,
                   color: Colors.white,
                 ),
               ),

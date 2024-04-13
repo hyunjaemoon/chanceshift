@@ -2,7 +2,10 @@ import 'package:dual_screen/dual_screen.dart';
 import 'package:flutter/material.dart';
 
 class MyDualApp extends StatefulWidget {
+  const MyDualApp({super.key});
+
   @override
+  // ignore: library_private_types_in_public_api
   _MyDualAppState createState() => _MyDualAppState();
 }
 

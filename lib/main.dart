@@ -11,13 +11,15 @@ void main(List<String> arguments) {
   bool enableFeature = results['enable-dual-screen'];
 
   if (enableFeature) {
-    runApp(MyDualApp());
+    runApp(const MyDualApp());
   } else {
-    runApp(MyApp());
+    runApp(const MyApp());
   }
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -27,7 +29,7 @@ class MyApp extends StatelessWidget {
         brightness: Brightness.dark,
         primaryColor: Colors.blueGrey,
       ),
-      home: MenuScreen(),
+      home: const MenuScreen(),
     );
   }
 }

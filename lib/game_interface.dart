@@ -7,7 +7,10 @@ import 'package:flutter/material.dart';
 const defaultTextStyle = TextStyle(fontSize: 25);
 
 class GameInterface extends StatefulWidget {
+  const GameInterface({super.key});
+
   @override
+  // ignore: library_private_types_in_public_api
   _GameInterfaceState createState() => _GameInterfaceState();
 }
 

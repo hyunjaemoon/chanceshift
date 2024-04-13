@@ -69,7 +69,10 @@ Future<CardList> loadCardList() async {
 }
 
 class CardListScreen extends StatefulWidget {
+  const CardListScreen({super.key});
+
   @override
+  // ignore: library_private_types_in_public_api
   _CardListScreenState createState() => _CardListScreenState();
 }
 
@@ -78,13 +81,13 @@ class _CardListScreenState extends State<CardListScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Card List'),
+        title: const Text('Card List'),
       ),
       body: FutureBuilder<CardList>(
         future: loadCardList(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
             return Center(child: Text('Error: ${snapshot.error}'));
           } else if (snapshot.hasData) {
@@ -106,7 +109,7 @@ class _CardListScreenState extends State<CardListScreen> {
               },
             );
           } else {
-            return Center(child: Text('No cards found.'));
+            return const Center(child: Text('No cards found.'));
           }
         },
       ),
