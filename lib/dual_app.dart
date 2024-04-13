@@ -37,12 +37,12 @@ class _MyDualAppState extends State<MyDualApp> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Foldable & Dual Screen Device"),
+        title: const Text("Foldable & Dual Screen Device"),
       ),
       body: TwoPane(
         startPane: Column(
           children: [
-            Text("Pane A"),
+            const Text("Pane A"),
             if (_showBothPanes) ...[
               Slider(
                   value: _paneProportion,
@@ -53,7 +53,7 @@ class _MyDualAppState extends State<MyDualApp> {
                       () => _paneProportion = value,
                     );
                   }),
-              Text((_paneProportion * 100).round().toString() + '%'),
+              Text('${(_paneProportion * 100).round()}%'),
             ],
             SwitchListTile(
                 title: const Text("Show Both Panes."),
@@ -67,7 +67,7 @@ class _MyDualAppState extends State<MyDualApp> {
         ),
         endPane: Column(
           children: [
-            Text("Pane B"),
+            const Text("Pane B"),
             SwitchListTile(
               title: Text(
                   "Direction is ${_directionIsHorizontal ? 'Horizontal' : 'Vertical'}"),

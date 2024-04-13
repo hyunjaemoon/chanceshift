@@ -1,6 +1,6 @@
 import 'package:args/args.dart';
-import 'package:chanceshfit/dual_main.dart';
-import 'package:chanceshfit/menu_screen.dart';
+import 'package:chanceshfit/app.dart';
+import 'package:chanceshfit/dual_app.dart';
 import 'package:flutter/material.dart';
 
 void main(List<String> arguments) {
@@ -14,22 +14,5 @@ void main(List<String> arguments) {
     runApp(const MyDualApp());
   } else {
     runApp(const MyApp());
-  }
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'ChanceShift',
-      theme: ThemeData(
-        fontFamily: 'VT323',
-        brightness: Brightness.dark,
-        primaryColor: Colors.blueGrey,
-      ),
-      home: MenuScreen(),
-    );
   }
 }
