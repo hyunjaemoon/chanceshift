@@ -7,7 +7,18 @@ import 'package:flutter/material.dart';
 const defaultTextStyle = TextStyle(fontSize: 25);
 
 class GameInterface extends StatefulWidget {
-  const GameInterface({super.key});
+  final int initialChancePercent;
+  final int initialAttackNum;
+  final int initialEnemyHp;
+  final int initialRemainingChances;
+
+  const GameInterface({
+    super.key,
+    this.initialChancePercent = 50, // Default value if not provided
+    this.initialAttackNum = 1,
+    this.initialEnemyHp = 5,
+    this.initialRemainingChances = 5,
+  });
 
   @override
   // ignore: library_private_types_in_public_api
@@ -15,10 +26,10 @@ class GameInterface extends StatefulWidget {
 }
 
 class _GameInterfaceState extends State<GameInterface> {
-  int chancePercent = 50;
-  int attackNum = 1;
-  int enemyHp = 5;
-  int remainingChances = 5;
+  late int chancePercent;
+  late int attackNum;
+  late int enemyHp;
+  late int remainingChances;
   List<int> cardIndices = [];
   Future<CardList>? cardsFuture;
 
@@ -26,10 +37,10 @@ class _GameInterfaceState extends State<GameInterface> {
 
   void reset() {
     setState(() {
-      chancePercent = 50;
-      attackNum = 1;
-      enemyHp = 5;
-      remainingChances = 5;
+      chancePercent = widget.initialChancePercent;
+      attackNum = widget.initialAttackNum;
+      enemyHp = widget.initialEnemyHp;
+      remainingChances = widget.initialRemainingChances;
       cardIndices = [];
     });
   }
@@ -38,13 +49,17 @@ class _GameInterfaceState extends State<GameInterface> {
   void initState() {
     super.initState();
     cardsFuture = loadCardList();
+    chancePercent = widget.initialChancePercent;
+    attackNum = widget.initialAttackNum;
+    enemyHp = widget.initialEnemyHp;
+    remainingChances = widget.initialRemainingChances;
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('ChanceShift v0.1', style: defaultTextStyle),
+        title: const Text('ChanceShift v0.1', style: defaultTextStyle),
       ),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -57,13 +72,18 @@ class _GameInterfaceState extends State<GameInterface> {
                   _buildStatCard('Enemy HP', enemyHp, (newValue) {
                     setState(() => enemyHp = newValue);
                   }),
-                  StatusBar(value: enemyHp, maxValue: 5, color: Colors.red),
+                  StatusBar(
+                      value: enemyHp,
+                      maxValue: widget.initialEnemyHp,
+                      color: Colors.red),
                   _buildStatCard('Remaining Chances', remainingChances,
                       (newValue) {
                     setState(() => remainingChances = newValue);
                   }),
                   StatusBar(
-                      value: remainingChances, maxValue: 5, color: Colors.blue),
+                      value: remainingChances,
+                      maxValue: widget.initialRemainingChances,
+                      color: Colors.blue),
                   _buildStatCard('Chance Percent', max(0, chancePercent),
                       (newValue) {
                     setState(() => chancePercent = newValue);
@@ -87,10 +107,10 @@ class _GameInterfaceState extends State<GameInterface> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => CardListScreen()),
+                            builder: (context) => const CardListScreen()),
                       );
                     },
-                    child: Text('View Cards', style: defaultTextStyle),
+                    child: const Text('View Cards', style: defaultTextStyle),
                   ),
                   PushButton(onPressed: _performAttack),
                 ],
@@ -107,7 +127,7 @@ class _GameInterfaceState extends State<GameInterface> {
       child: ListTile(
         title: Text('$label: $value', style: defaultTextStyle),
         trailing: IconButton(
-          icon: Icon(Icons.add),
+          icon: const Icon(Icons.add),
           onPressed: () {
             onChanged(value + 1);
           },
@@ -142,9 +162,9 @@ class _GameInterfaceState extends State<GameInterface> {
             },
           );
         } else if (snapshot.hasError) {
-          return Text("Error loading cards.");
+          return const Text("Error loading cards.");
         } else {
-          return CircularProgressIndicator();
+          return const CircularProgressIndicator();
         }
       },
     );
@@ -165,14 +185,14 @@ class _GameInterfaceState extends State<GameInterface> {
           if (chancePercent >= 100 || chancePercent >= Random().nextInt(100)) {
             enemyHp -= 1;
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
+              const SnackBar(
                 content: Text('Attack Success!', style: defaultTextStyle),
                 duration: Duration(seconds: 1), // Duration can be adjusted
               ),
             );
           } else {
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
+              const SnackBar(
                 content: Text(
                   'Attack Failed...',
                   style: defaultTextStyle,
@@ -190,16 +210,16 @@ class _GameInterfaceState extends State<GameInterface> {
         context: context,
         builder: (context) {
           return AlertDialog(
-            title: Text('You win!'),
-            content:
-                Text('You defeated the enemy!', style: TextStyle(fontSize: 18)),
+            title: const Text('You win!'),
+            content: const Text('You defeated the enemy!',
+                style: TextStyle(fontSize: 18)),
             actions: <Widget>[
               TextButton(
                 onPressed: () {
                   Navigator.of(context).pop();
                   reset();
                 },
-                child: Text('OK'),
+                child: const Text('OK'),
               ),
             ],
           );
@@ -210,16 +230,16 @@ class _GameInterfaceState extends State<GameInterface> {
         context: context,
         builder: (context) {
           return AlertDialog(
-            title: Text('Game Over'),
-            content:
-                Text('You ran out of chances!', style: TextStyle(fontSize: 18)),
+            title: const Text('Game Over'),
+            content: const Text('You ran out of chances!',
+                style: TextStyle(fontSize: 18)),
             actions: <Widget>[
               TextButton(
                 onPressed: () {
                   Navigator.of(context).pop();
                   reset();
                 },
-                child: Text('OK'),
+                child: const Text('OK'),
               ),
             ],
           );

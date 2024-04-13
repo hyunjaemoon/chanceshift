@@ -1,5 +1,6 @@
 import 'package:chanceshfit/credit_screen.dart';
 import 'package:chanceshfit/game_interface.dart';
+import 'package:chanceshfit/tutorial.dart';
 import 'package:flutter/material.dart';
 
 class MenuScreen extends StatefulWidget {
@@ -73,6 +74,30 @@ class _MenuScreenState extends State<MenuScreen>
                 'Demo Game',
                 style: TextStyle(
                   fontSize: 30,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: () {
+                // Handle Credits button press
+                Navigator.push(
+                  context,
+                  PageRouteBuilder(
+                    transitionDuration: const Duration(milliseconds: 500),
+                    pageBuilder: (context, animation, secondaryAnimation) =>
+                        FadeTransition(
+                      opacity: animation,
+                      child: TutorialWidget(),
+                    ),
+                  ),
+                );
+              },
+              child: const Text(
+                'Tutorial',
+                style: TextStyle(
+                  fontSize: 25,
                   color: Colors.white,
                 ),
               ),
