@@ -44,13 +44,10 @@ class _MenuScreenState extends State<MenuScreen>
                   child: child,
                 );
               },
-              child: Text(
-                'ChanceShift',
-                style: TextStyle(
-                  fontSize: 32,
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                ),
+              child: Image.asset(
+                'images/game_logo.png',
+                width: 400,
+                height: 400,
               ),
             ),
             SizedBox(height: 16),
@@ -59,11 +56,18 @@ class _MenuScreenState extends State<MenuScreen>
                 // Handle Start button press
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => GameInterface()),
+                  PageRouteBuilder(
+                    transitionDuration: Duration(milliseconds: 500),
+                    pageBuilder: (context, animation, secondaryAnimation) =>
+                        FadeTransition(
+                      opacity: animation,
+                      child: GameInterface(),
+                    ),
+                  ),
                 );
               },
               child: Text(
-                'Start',
+                'Demo Game',
                 style: TextStyle(
                   fontSize: 24,
                   color: Colors.white,
@@ -76,7 +80,14 @@ class _MenuScreenState extends State<MenuScreen>
                 // Handle Credits button press
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => CreditScreen()),
+                  PageRouteBuilder(
+                    transitionDuration: Duration(milliseconds: 500),
+                    pageBuilder: (context, animation, secondaryAnimation) =>
+                        FadeTransition(
+                      opacity: animation,
+                      child: CreditScreen(),
+                    ),
+                  ),
                 );
               },
               child: Text(
