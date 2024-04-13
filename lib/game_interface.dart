@@ -7,6 +7,8 @@ import 'package:flutter/material.dart';
 
 const defaultTextStyle = TextStyle(fontSize: 25);
 
+const totalCardNumber = 3;
+
 class GameInterface extends StatefulWidget {
   final int initialChancePercent;
   final int initialAttackNum;
@@ -137,8 +139,8 @@ class _GameInterfaceState extends State<GameInterface>
                     SwordIconsRow(numIcons: attackNum),
                     Wrap(
                       spacing: 8.0,
-                      children: List.generate(
-                          4, (index) => _buildCardSelector(index)),
+                      children: List.generate(totalCardNumber,
+                          (index) => _buildCardSelector(index)),
                     ),
                     ElevatedButton(
                       onPressed: () {
@@ -169,11 +171,22 @@ class _GameInterfaceState extends State<GameInterface>
     return Card(
       child: ListTile(
         title: Text('$label: $value', style: defaultTextStyle),
-        trailing: IconButton(
-          icon: const Icon(Icons.add),
-          onPressed: () {
-            onChanged(value + 1);
-          },
+        trailing: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            IconButton(
+              icon: const Icon(Icons.remove),
+              onPressed: () {
+                onChanged(value - 1);
+              },
+            ),
+            IconButton(
+              icon: const Icon(Icons.add),
+              onPressed: () {
+                onChanged(value + 1);
+              },
+            ),
+          ],
         ),
       ),
     );
@@ -226,6 +239,9 @@ class _GameInterfaceState extends State<GameInterface>
         remainingChances--;
       });
       for (int i = 0; i < attackNum; i++) {
+        if (enemyHp <= 0) {
+          break;
+        }
         showDialog(
           // ignore: use_build_context_synchronously
           context: context,
