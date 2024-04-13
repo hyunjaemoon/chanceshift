@@ -7,7 +7,11 @@ class CreditScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Credits'),
+        title: Image.asset(
+          'images/game_logo.png',
+          width: 70,
+          height: 70,
+        ),
       ),
       body: Container(
         padding: const EdgeInsets.all(20),

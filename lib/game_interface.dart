@@ -59,7 +59,12 @@ class _GameInterfaceState extends State<GameInterface> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('ChanceShift v0.1', style: defaultTextStyle),
+        title: Image.asset(
+          'images/game_logo.png',
+          width: 70,
+          height: 70,
+        ),
+        centerTitle: true,
       ),
       body: Padding(
         padding: const EdgeInsets.all(8.0),

@@ -7,7 +7,11 @@ class TutorialWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('ChanceShift Tutorial'),
+        title: Image.asset(
+          'images/game_logo.png',
+          width: 70,
+          height: 70,
+        ),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
