@@ -1,6 +1,6 @@
 import 'package:args/args.dart';
 import 'package:chanceshfit/dual_main.dart';
-import 'package:chanceshfit/game_interface.dart';
+import 'package:chanceshfit/menu_screen.dart';
 import 'package:flutter/material.dart';
 
 void main(List<String> arguments) {
@@ -27,7 +27,7 @@ class MyApp extends StatelessWidget {
         brightness: Brightness.dark,
         primaryColor: Colors.blueGrey,
       ),
-      home: GameInterface(),
+      home: MenuScreen(),
     );
   }
 }
