@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:chanceshfit/card_list.dart';
+import 'package:chanceshfit/slash.dart';
 import 'package:chanceshfit/ui.dart';
 import 'package:flutter/material.dart';
 
@@ -25,13 +26,18 @@ class GameInterface extends StatefulWidget {
   _GameInterfaceState createState() => _GameInterfaceState();
 }
 
-class _GameInterfaceState extends State<GameInterface> {
+class _GameInterfaceState extends State<GameInterface>
+    with SingleTickerProviderStateMixin {
   late int chancePercent;
   late int attackNum;
   late int enemyHp;
   late int remainingChances;
   List<int> cardIndices = [];
   Future<CardList>? cardsFuture;
+
+  AnimationController? _controller;
+  // ignore: unused_field
+  Animation<double>? _shakeAnimation;
 
   bool _isPerformingAttack = false;
 
@@ -53,10 +59,36 @@ class _GameInterfaceState extends State<GameInterface> {
     attackNum = widget.initialAttackNum;
     enemyHp = widget.initialEnemyHp;
     remainingChances = widget.initialRemainingChances;
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 200),
+      vsync: this,
+    );
+    _shakeAnimation = Tween<double>(begin: 0.0, end: 10.0).animate(_controller!)
+      ..addListener(() {
+        setState(() {});
+      })
+      ..addStatusListener((status) {
+        if (status == AnimationStatus.completed) {
+          _controller!.reverse();
+        }
+      });
+  }
+
+  @override
+  void dispose() {
+    _controller!.dispose();
+    super.dispose();
+  }
+
+  void startShake() {
+    _controller!.forward(from: 0.0);
   }
 
   @override
   Widget build(BuildContext context) {
+    double offsetX =
+        sin(_controller!.value * pi * 10) * (_controller!.value * 10);
+
     return Scaffold(
       appBar: AppBar(
         title: Image.asset(
@@ -66,62 +98,68 @@ class _GameInterfaceState extends State<GameInterface> {
         ),
         centerTitle: true,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            Expanded(
-              child: ListView(
-                children: [
-                  _buildStatCard('Enemy HP', enemyHp, (newValue) {
-                    setState(() => enemyHp = newValue);
-                  }),
-                  StatusBar(
-                      value: enemyHp,
-                      maxValue: widget.initialEnemyHp,
-                      color: Colors.red),
-                  _buildStatCard('Remaining Chances', remainingChances,
-                      (newValue) {
-                    setState(() => remainingChances = newValue);
-                  }),
-                  StatusBar(
-                      value: remainingChances,
-                      maxValue: widget.initialRemainingChances,
-                      color: Colors.blue),
-                  _buildStatCard('Chance Percent', max(0, chancePercent),
-                      (newValue) {
-                    setState(() => chancePercent = newValue);
-                  }),
-                  StatusBar(
-                      value: max(0, chancePercent),
-                      maxValue: 100,
-                      color: Colors.green),
-                  _buildStatCard('Attack Number', attackNum, (newValue) {
-                    setState(() => attackNum = newValue);
-                  }),
-                  SwordIconsRow(numIcons: attackNum),
-                  Wrap(
-                    spacing: 8.0,
-                    children:
-                        List.generate(3, (index) => _buildCardSelector(index)),
-                  ),
-                  ElevatedButton(
-                    onPressed: () {
-                      // Navigate to CardListScreen
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const CardListScreen()),
-                      );
-                    },
-                    child: const Text('View Cards', style: defaultTextStyle),
-                  ),
-                  PushButton(onPressed: _performAttack),
-                ],
+      body: Transform.translate(
+        offset: Offset(offsetX, 0),
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: <Widget>[
+              Expanded(
+                child: ListView(
+                  children: [
+                    _buildStatCard('Enemy HP', enemyHp, (newValue) {
+                      setState(() => enemyHp = newValue);
+                    }),
+                    StatusBar(
+                        value: enemyHp,
+                        maxValue: widget.initialEnemyHp,
+                        color: Colors.red),
+                    _buildStatCard('Remaining Chances', remainingChances,
+                        (newValue) {
+                      setState(() => remainingChances = newValue);
+                    }),
+                    StatusBar(
+                        value: remainingChances,
+                        maxValue: widget.initialRemainingChances,
+                        color: Colors.blue),
+                    _buildStatCard('Chance Percent', max(0, chancePercent),
+                        (newValue) {
+                      setState(() => chancePercent = newValue);
+                    }),
+                    StatusBar(
+                        value: max(0, chancePercent),
+                        maxValue: 100,
+                        color: Colors.green),
+                    _buildStatCard('Attack Number', attackNum, (newValue) {
+                      setState(() => attackNum = newValue);
+                    }),
+                    SwordIconsRow(numIcons: attackNum),
+                    Wrap(
+                      spacing: 8.0,
+                      children: List.generate(
+                          4, (index) => _buildCardSelector(index)),
+                    ),
+                    ElevatedButton(
+                      onPressed: () {
+                        // Navigate to CardListScreen
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const CardListScreen()),
+                        );
+                      },
+                      child: const Text('View Cards', style: defaultTextStyle),
+                    ),
+                    PushButton(
+                      onPressed: _performAttack,
+                      isPerformingAttack: _isPerformingAttack,
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -151,7 +189,7 @@ class _GameInterfaceState extends State<GameInterface> {
           return FilterChip(
             selected: isSelected,
             label: Text(cards.cards[cardIndex].name,
-                style: TextStyle(fontSize: 18)),
+                style: const TextStyle(fontSize: 18)),
             onSelected: (bool selected) {
               setState(() {
                 if (selected) {
@@ -175,7 +213,7 @@ class _GameInterfaceState extends State<GameInterface> {
     );
   }
 
-  void _performAttack() {
+  void _performAttack() async {
     if (_isPerformingAttack) return;
 
     setState(() {
@@ -186,32 +224,49 @@ class _GameInterfaceState extends State<GameInterface> {
     if (remainingChances > 0 && enemyHp > 0) {
       setState(() {
         remainingChances--;
-        for (int i = 0; i < attackNum; i++) {
-          if (chancePercent >= 100 || chancePercent >= Random().nextInt(100)) {
-            enemyHp -= 1;
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Attack Success!', style: defaultTextStyle),
-                duration: Duration(seconds: 1), // Duration can be adjusted
-              ),
-            );
-          } else {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text(
-                  'Attack Failed...',
-                  style: defaultTextStyle,
-                ),
-                duration: Duration(seconds: 1), // Duration can be adjusted
-              ),
-            );
-          }
-        }
       });
+      for (int i = 0; i < attackNum; i++) {
+        showDialog(
+          // ignore: use_build_context_synchronously
+          context: context,
+          builder: (context) => const SlashAnimation(),
+        );
+        await Future.delayed(const Duration(
+            milliseconds: 500)); // Add a delay of 500 milliseconds
+        if (chancePercent >= 100 || chancePercent >= Random().nextInt(100)) {
+          // Shake the screen
+          startShake();
+          setState(() {
+            enemyHp -= 1;
+          });
+          // ignore: use_build_context_synchronously
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Attack Success!', style: defaultTextStyle),
+              duration: Duration(seconds: 1), // Duration can be adjusted
+            ),
+          );
+        } else {
+          // ignore: use_build_context_synchronously
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text(
+                'Attack Failed...',
+                style: defaultTextStyle,
+              ),
+              duration: Duration(seconds: 1), // Duration can be adjusted
+            ),
+          );
+        }
+        if (i < attackNum - 1) {
+          await Future.delayed(const Duration(seconds: 1, milliseconds: 500));
+        }
+      }
     }
     // Perform other game logic like checking for win/lose conditions
-    if (enemyHp == 0) {
+    if (enemyHp <= 0) {
       showDialog(
+        // ignore: use_build_context_synchronously
         context: context,
         builder: (context) {
           return AlertDialog(
@@ -232,6 +287,7 @@ class _GameInterfaceState extends State<GameInterface> {
       );
     } else if (remainingChances == 0) {
       showDialog(
+        // ignore: use_build_context_synchronously
         context: context,
         builder: (context) {
           return AlertDialog(

@@ -20,6 +20,13 @@
             "attack_value": 2,
             "name": "Double trouble",
             "description": "I feel like I should attack twice more!"
+        },
+        {
+            "idx": 3,
+            "chance_value": 50,
+            "attack_value": 4,
+            "name": "TESTING",
+            "description": "I feel like I should attack twice more!"
         }
     ]
 }

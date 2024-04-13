@@ -3,8 +3,10 @@ import 'package:material_design_icons_flutter/material_design_icons_flutter.dart
 
 class PushButton extends StatefulWidget {
   final VoidCallback onPressed;
+  final bool isPerformingAttack;
 
-  const PushButton({super.key, required this.onPressed});
+  const PushButton(
+      {super.key, required this.onPressed, required this.isPerformingAttack});
 
   @override
   // ignore: library_private_types_in_public_api
@@ -13,6 +15,11 @@ class PushButton extends StatefulWidget {
 
 class _PushButtonState extends State<PushButton> {
   bool isPressed = false;
+
+  @override
+  void initState() {
+    super.initState();
+  }
 
   void _onTapDown(TapDownDetails details) {
     setState(() => isPressed = true);
@@ -59,7 +66,8 @@ class _PushButtonState extends State<PushButton> {
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               border: Border.all(
-                color: Colors.redAccent,
+                color:
+                    widget.isPerformingAttack ? Colors.redAccent : Colors.black,
                 width: 4.0,
                 style: BorderStyle.solid,
               ),

@@ -38,6 +38,7 @@ dependencies:
   material_design_icons_flutter: ^7.0.7296
   dual_screen: ^1.0.4
   args: ^2.5.0
+  gif: ^2.3.0
 
 dev_dependencies:
   flutter_test:
@@ -68,6 +69,7 @@ flutter:
   assets:
     - json/card_info.json
     - images/game_logo.png
+    - images/slash.gif
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
