@@ -39,7 +39,7 @@ class _CardDisplayState extends State<CardDisplay>
           child: AnimatedContainer(
             duration: duration,
             width: 150,
-            height: (widget.selected && !widget.used) ? 125 : 20,
+            height: (widget.selected && !widget.used) ? 100 : 20,
             curve: Curves.ease,
             child: widget.used
                 ? CardSmallDisplayScreen(

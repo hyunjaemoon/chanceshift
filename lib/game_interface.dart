@@ -9,7 +9,7 @@ import 'package:just_audio/just_audio.dart';
 
 const defaultTextStyle = TextStyle(fontSize: 25);
 
-const totalCardNumber = 3;
+const totalCardNumber = 4;
 
 class GameInterface extends StatefulWidget {
   final int initialChancePercent;
@@ -112,7 +112,6 @@ class _GameInterfaceState extends State<GameInterface>
         child: Padding(
           padding: const EdgeInsets.all(8.0),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
               Expanded(
                 child: ListView(
@@ -160,13 +159,14 @@ class _GameInterfaceState extends State<GameInterface>
                       },
                       child: const Text('View Cards', style: defaultTextStyle),
                     ),
-                    PushButton(
-                      onPressed: _performAttack,
-                      isPerformingAttack: _isPerformingAttack,
-                    ),
                   ],
                 ),
               ),
+              PushButton(
+                onPressed: _performAttack,
+                isPerformingAttack: _isPerformingAttack,
+              ),
+              const SizedBox(height: 25),
             ],
           ),
         ),
@@ -178,22 +178,8 @@ class _GameInterfaceState extends State<GameInterface>
     return Card(
       child: ListTile(
         title: Text('$label: $value', style: defaultTextStyle),
-        trailing: Row(
+        trailing: const Row(
           mainAxisSize: MainAxisSize.min,
-          children: [
-            IconButton(
-              icon: const Icon(Icons.remove),
-              onPressed: () {
-                onChanged(value - 1);
-              },
-            ),
-            IconButton(
-              icon: const Icon(Icons.add),
-              onPressed: () {
-                onChanged(value + 1);
-              },
-            ),
-          ],
         ),
       ),
     );
@@ -251,14 +237,10 @@ class _GameInterfaceState extends State<GameInterface>
       setState(() {
         remainingChances--;
       });
-      for (int i = 0; i < attackNum; i++) {
+      while (attackNum > 0) {
         setState(() {
           attackNum--;
         });
-
-        if (enemyHp <= 0) {
-          break;
-        }
         showDialog(
           // ignore: use_build_context_synchronously
           context: context,
@@ -296,6 +278,9 @@ class _GameInterfaceState extends State<GameInterface>
           );
         }
         await Future.delayed(const Duration(seconds: 1, milliseconds: 500));
+        if (enemyHp <= 0) {
+          break;
+        }
       }
     }
     // Perform other game logic like checking for win/lose conditions

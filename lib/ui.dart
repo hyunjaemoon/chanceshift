@@ -68,7 +68,7 @@ class _PushButtonState extends State<PushButton> {
               border: Border.all(
                 color:
                     widget.isPerformingAttack ? Colors.redAccent : Colors.black,
-                width: 4.0,
+                width: 10.0,
                 style: BorderStyle.solid,
               ),
             ),
@@ -102,7 +102,7 @@ class StatusBar extends StatefulWidget {
     required this.maxValue,
     this.color = Colors.green,
     this.width = 200,
-    this.height = 30,
+    this.height = 10,
   });
 
   @override

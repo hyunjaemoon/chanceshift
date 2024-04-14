@@ -2,14 +2,14 @@
     "cards": [
         {
             "idx": 0,
-            "chance_value": 25,
+            "chance_value": 15,
             "attack_value": 0,
             "name": "I feel lucky",
             "description": "I have a good feeling about this"
         },
         {
             "idx": 1,
-            "chance_value": -25,
+            "chance_value": -10,
             "attack_value": 1,
             "name": "Just one more time",
             "description": "I feel like I should attack one more time!"
@@ -20,6 +20,13 @@
             "attack_value": 2,
             "name": "Double trouble",
             "description": "I feel like I should attack twice more!"
+        },
+        {
+            "idx": 3,
+            "chance_value": 30,
+            "attack_value": -1,
+            "name": "Taking Time",
+            "description": "I'm going to aim super carefully!"
         }
     ]
 }
