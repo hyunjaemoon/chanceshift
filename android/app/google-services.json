@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "746779354872",
+    "project_id": "chanceshift-moonsaga",
+    "storage_bucket": "chanceshift-moonsaga.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:746779354872:android:57e678128e90f47e2cbd0d",
+        "android_client_info": {
+          "package_name": "com.example.chanceshfit"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBfnsyyiNE0TZvOSLVFsxE3MA4i2NmKxsI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

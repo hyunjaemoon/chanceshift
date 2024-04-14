@@ -28,3 +28,6 @@ doc/api/
 
 .metadata
 .idea/
+
+# Firebase API Keys
+lib/firebase_options.dart
