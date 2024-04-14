@@ -39,7 +39,7 @@ class _PushButtonState extends State<PushButton> {
       onTapDown: _onTapDown,
       onTapUp: _onTapUp,
       onTapCancel: _onTapCancel,
-      onTap: widget.onPressed,
+      onTap: widget.isPerformingAttack ? null : widget.onPressed,
       child: Transform.scale(
         scale: isPressed ? 0.95 : 1.0,
         child: Container(

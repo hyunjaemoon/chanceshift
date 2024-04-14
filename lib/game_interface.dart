@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:chanceshfit/card_display.dart';
 import 'package:chanceshfit/card_list.dart';
 import 'package:chanceshfit/slash.dart';
 import 'package:chanceshfit/ui.dart';
@@ -36,6 +37,7 @@ class _GameInterfaceState extends State<GameInterface>
   late int enemyHp;
   late int remainingChances;
   List<int> cardIndices = [];
+  Set<int> usedCardIndices = {};
   Future<CardList>? cardsFuture;
 
   AudioPlayer _audioPlayer = AudioPlayer();
@@ -53,6 +55,7 @@ class _GameInterfaceState extends State<GameInterface>
       enemyHp = widget.initialEnemyHp;
       remainingChances = widget.initialRemainingChances;
       cardIndices = [];
+      usedCardIndices = {};
     });
   }
 
@@ -203,12 +206,15 @@ class _GameInterfaceState extends State<GameInterface>
         if (snapshot.hasData) {
           var cards = snapshot.data!;
           bool isSelected = cardIndices.contains(cards.cards[cardIndex].idx);
-          return FilterChip(
+          return CardDisplay(
             selected: isSelected,
-            label: Text(cards.cards[cardIndex].name,
-                style: const TextStyle(fontSize: 18)),
+            used: usedCardIndices.contains(cards.cards[cardIndex].idx),
+            cardInfo: cards.cards[cardIndex],
             onSelected: (bool selected) {
               setState(() {
+                if (usedCardIndices.contains(cards.cards[cardIndex].idx)) {
+                  return;
+                }
                 if (selected) {
                   cardIndices.add(cards.cards[cardIndex].idx);
                   chancePercent += cards.cards[cardIndex].chanceValue;
@@ -237,12 +243,19 @@ class _GameInterfaceState extends State<GameInterface>
       _isPerformingAttack = true;
     });
 
+    // Add all the selected cards to usedCardIndices
+    usedCardIndices.addAll(cardIndices);
+
     // Dummy logic for an attack
     if (remainingChances > 0 && enemyHp > 0) {
       setState(() {
         remainingChances--;
       });
       for (int i = 0; i < attackNum; i++) {
+        setState(() {
+          attackNum--;
+        });
+
         if (enemyHp <= 0) {
           break;
         }
@@ -282,9 +295,7 @@ class _GameInterfaceState extends State<GameInterface>
             ),
           );
         }
-        if (i < attackNum - 1) {
-          await Future.delayed(const Duration(seconds: 1, milliseconds: 500));
-        }
+        await Future.delayed(const Duration(seconds: 1, milliseconds: 500));
       }
     }
     // Perform other game logic like checking for win/lose conditions
@@ -332,6 +343,8 @@ class _GameInterfaceState extends State<GameInterface>
       );
     }
     setState(() {
+      chancePercent = widget.initialChancePercent;
+      attackNum = widget.initialAttackNum;
       _isPerformingAttack = false;
     });
   }
