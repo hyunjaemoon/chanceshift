@@ -35,7 +35,7 @@ class _MenuScreenState extends State<MenuScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: const Color.fromARGB(255, 0, 0, 40),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -89,7 +89,7 @@ class _MenuScreenState extends State<MenuScreen>
                     pageBuilder: (context, animation, secondaryAnimation) =>
                         FadeTransition(
                       opacity: animation,
-                      child: TutorialWidget(),
+                      child: const TutorialWidget(),
                     ),
                   ),
                 );

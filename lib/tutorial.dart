@@ -58,18 +58,13 @@ class TutorialWidget extends StatelessWidget {
               ),
               const SizedBox(height: 16),
               _buildStep(
-                '1. Adjust the values',
-                'You can adjust the values of Enemy HP, Remaining Chances, Chance Percent, and Attack Number by tapping the "+" button next to each value.',
-              ),
-              const SizedBox(height: 8),
-              _buildStep(
-                '2. Select cards',
+                '1. Select cards',
                 'You can select up to 3 cards from the available options. Each card provides additional chance percent and attack number.',
               ),
               const SizedBox(height: 8),
               _buildStep(
-                '3. Perform an attack',
-                'Tap the "Perform Attack" button to perform the attacks. The game will calculate the success or failure of each attack based on the chance percent.',
+                '2. Perform an attack',
+                'Tap the "Perform Attack" button to perform an attack. The game will calculate the chance of success based on the chance percent and perform the specified number of attacks. If the attack is successful, the enemy\'s HP will decrease. If the attack fails, nothing will happen.',
               ),
               const SizedBox(height: 16),
               const Text(

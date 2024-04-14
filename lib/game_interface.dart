@@ -1,13 +1,15 @@
 import 'dart:math';
 
+import 'package:chanceshfit/card_display.dart';
 import 'package:chanceshfit/card_list.dart';
 import 'package:chanceshfit/slash.dart';
 import 'package:chanceshfit/ui.dart';
 import 'package:flutter/material.dart';
+import 'package:just_audio/just_audio.dart';
 
 const defaultTextStyle = TextStyle(fontSize: 25);
 
-const totalCardNumber = 3;
+const totalCardNumber = 4;
 
 class GameInterface extends StatefulWidget {
   final int initialChancePercent;
@@ -35,7 +37,10 @@ class _GameInterfaceState extends State<GameInterface>
   late int enemyHp;
   late int remainingChances;
   List<int> cardIndices = [];
+  Set<int> usedCardIndices = {};
   Future<CardList>? cardsFuture;
+
+  AudioPlayer _audioPlayer = AudioPlayer();
 
   AnimationController? _controller;
   // ignore: unused_field
@@ -50,6 +55,7 @@ class _GameInterfaceState extends State<GameInterface>
       enemyHp = widget.initialEnemyHp;
       remainingChances = widget.initialRemainingChances;
       cardIndices = [];
+      usedCardIndices = {};
     });
   }
 
@@ -79,6 +85,7 @@ class _GameInterfaceState extends State<GameInterface>
   @override
   void dispose() {
     _controller!.dispose();
+    _audioPlayer.dispose();
     super.dispose();
   }
 
@@ -105,7 +112,6 @@ class _GameInterfaceState extends State<GameInterface>
         child: Padding(
           padding: const EdgeInsets.all(8.0),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
               Expanded(
                 child: ListView(
@@ -153,13 +159,14 @@ class _GameInterfaceState extends State<GameInterface>
                       },
                       child: const Text('View Cards', style: defaultTextStyle),
                     ),
-                    PushButton(
-                      onPressed: _performAttack,
-                      isPerformingAttack: _isPerformingAttack,
-                    ),
                   ],
                 ),
               ),
+              PushButton(
+                onPressed: _performAttack,
+                isPerformingAttack: _isPerformingAttack,
+              ),
+              const SizedBox(height: 25),
             ],
           ),
         ),
@@ -171,22 +178,8 @@ class _GameInterfaceState extends State<GameInterface>
     return Card(
       child: ListTile(
         title: Text('$label: $value', style: defaultTextStyle),
-        trailing: Row(
+        trailing: const Row(
           mainAxisSize: MainAxisSize.min,
-          children: [
-            IconButton(
-              icon: const Icon(Icons.remove),
-              onPressed: () {
-                onChanged(value - 1);
-              },
-            ),
-            IconButton(
-              icon: const Icon(Icons.add),
-              onPressed: () {
-                onChanged(value + 1);
-              },
-            ),
-          ],
         ),
       ),
     );
@@ -199,12 +192,15 @@ class _GameInterfaceState extends State<GameInterface>
         if (snapshot.hasData) {
           var cards = snapshot.data!;
           bool isSelected = cardIndices.contains(cards.cards[cardIndex].idx);
-          return FilterChip(
+          return CardDisplay(
             selected: isSelected,
-            label: Text(cards.cards[cardIndex].name,
-                style: const TextStyle(fontSize: 18)),
+            used: usedCardIndices.contains(cards.cards[cardIndex].idx),
+            cardInfo: cards.cards[cardIndex],
             onSelected: (bool selected) {
               setState(() {
+                if (usedCardIndices.contains(cards.cards[cardIndex].idx)) {
+                  return;
+                }
                 if (selected) {
                   cardIndices.add(cards.cards[cardIndex].idx);
                   chancePercent += cards.cards[cardIndex].chanceValue;
@@ -233,23 +229,30 @@ class _GameInterfaceState extends State<GameInterface>
       _isPerformingAttack = true;
     });
 
+    // Add all the selected cards to usedCardIndices
+    usedCardIndices.addAll(cardIndices);
+
     // Dummy logic for an attack
     if (remainingChances > 0 && enemyHp > 0) {
       setState(() {
         remainingChances--;
       });
-      for (int i = 0; i < attackNum; i++) {
-        if (enemyHp <= 0) {
-          break;
-        }
+      while (attackNum > 0) {
+        setState(() {
+          attackNum--;
+        });
         showDialog(
           // ignore: use_build_context_synchronously
           context: context,
           builder: (context) => const SlashAnimation(),
         );
         await Future.delayed(const Duration(
-            milliseconds: 500)); // Add a delay of 500 milliseconds
+            seconds: 1, milliseconds: 500)); // Add a delay of 500 milliseconds
         if (chancePercent >= 100 || chancePercent >= Random().nextInt(100)) {
+          // Play Hit Audio
+          await _audioPlayer.setAsset('audio/whoosh.wav');
+          _audioPlayer.play();
+
           // Shake the screen
           startShake();
           setState(() {
@@ -274,8 +277,9 @@ class _GameInterfaceState extends State<GameInterface>
             ),
           );
         }
-        if (i < attackNum - 1) {
-          await Future.delayed(const Duration(seconds: 1, milliseconds: 500));
+        await Future.delayed(const Duration(seconds: 1, milliseconds: 500));
+        if (enemyHp <= 0) {
+          break;
         }
       }
     }
@@ -324,6 +328,8 @@ class _GameInterfaceState extends State<GameInterface>
       );
     }
     setState(() {
+      chancePercent = widget.initialChancePercent;
+      attackNum = widget.initialAttackNum;
       _isPerformingAttack = false;
     });
   }

@@ -27,7 +27,8 @@ doc/api/
 .flutter-plugins-dependencies
 
 .metadata
-.idea/
+.idea
+.DS_Store
 
 # Firebase API Keys
 lib/firebase_options.dart
