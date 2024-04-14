@@ -42,6 +42,7 @@ dependencies:
   flutter_launcher_icons: ^0.13.1
   just_audio: ^0.9.37
   synchronized: ^3.1.0+1
+  firebase_core: ^2.29.0
 
 dev_dependencies:
   flutter_test:
