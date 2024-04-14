@@ -39,6 +39,7 @@ dependencies:
   dual_screen: ^1.0.4
   args: ^2.5.0
   gif: ^2.3.0
+  flutter_launcher_icons: ^0.13.1
 
 dev_dependencies:
   flutter_test:
@@ -100,3 +101,8 @@ flutter:
     - family: VT323
       fonts:
         - asset: fonts/VT323-Regular.ttf
+
+flutter_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "images/app_icon.png"
