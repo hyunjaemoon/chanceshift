@@ -40,6 +40,7 @@ dependencies:
   args: ^2.5.0
   gif: ^2.3.0
   flutter_launcher_icons: ^0.13.1
+  just_audio: ^0.9.37
 
 dev_dependencies:
   flutter_test:
@@ -68,6 +69,8 @@ flutter:
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg
   assets:
+    - audio/hit.mp3
+    - audio/whoosh.wav
     - json/card_info.json
     - images/game_logo.png
     - images/slash.gif

@@ -4,6 +4,7 @@ import 'package:chanceshfit/card_list.dart';
 import 'package:chanceshfit/slash.dart';
 import 'package:chanceshfit/ui.dart';
 import 'package:flutter/material.dart';
+import 'package:just_audio/just_audio.dart';
 
 const defaultTextStyle = TextStyle(fontSize: 25);
 
@@ -36,6 +37,8 @@ class _GameInterfaceState extends State<GameInterface>
   late int remainingChances;
   List<int> cardIndices = [];
   Future<CardList>? cardsFuture;
+
+  AudioPlayer _audioPlayer = AudioPlayer();
 
   AnimationController? _controller;
   // ignore: unused_field
@@ -79,6 +82,7 @@ class _GameInterfaceState extends State<GameInterface>
   @override
   void dispose() {
     _controller!.dispose();
+    _audioPlayer.dispose();
     super.dispose();
   }
 
@@ -248,8 +252,12 @@ class _GameInterfaceState extends State<GameInterface>
           builder: (context) => const SlashAnimation(),
         );
         await Future.delayed(const Duration(
-            milliseconds: 500)); // Add a delay of 500 milliseconds
+            seconds: 1, milliseconds: 500)); // Add a delay of 500 milliseconds
         if (chancePercent >= 100 || chancePercent >= Random().nextInt(100)) {
+          // Play Hit Audio
+          await _audioPlayer.setAsset('audio/whoosh.wav');
+          _audioPlayer.play();
+
           // Shake the screen
           startShake();
           setState(() {

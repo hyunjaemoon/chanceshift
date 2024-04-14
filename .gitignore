@@ -28,3 +28,4 @@ doc/api/
 
 .metadata
 .idea/
+.DS_Store
