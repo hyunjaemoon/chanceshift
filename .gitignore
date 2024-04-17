@@ -29,6 +29,7 @@ doc/api/
 .metadata
 .idea
 .DS_Store
+.vscode
 
 # Firebase API Keys
 lib/firebase_options.dart

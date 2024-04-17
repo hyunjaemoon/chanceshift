@@ -40,7 +40,7 @@ class _GameInterfaceState extends State<GameInterface>
   Set<int> usedCardIndices = {};
   Future<CardList>? cardsFuture;
 
-  AudioPlayer _audioPlayer = AudioPlayer();
+  final AudioPlayer _audioPlayer = AudioPlayer();
 
   AnimationController? _controller;
   // ignore: unused_field
@@ -145,6 +145,7 @@ class _GameInterfaceState extends State<GameInterface>
                     SwordIconsRow(numIcons: attackNum),
                     Wrap(
                       spacing: 8.0,
+                      alignment: WrapAlignment.center,
                       children: List.generate(totalCardNumber,
                           (index) => _buildCardSelector(index)),
                     ),
@@ -224,6 +225,20 @@ class _GameInterfaceState extends State<GameInterface>
 
   void _performAttack() async {
     if (_isPerformingAttack) return;
+
+    if (attackNum <= 0) {
+      // ignore: use_build_context_synchronously
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'You cannot attack with 0 Attack Number!',
+            style: defaultTextStyle,
+          ),
+          duration: Duration(seconds: 1), // Duration can be adjusted
+        ),
+      );
+      return;
+    }
 
     setState(() {
       _isPerformingAttack = true;

@@ -11,24 +11,46 @@ class MenuScreen extends StatefulWidget {
   _MenuScreenState createState() => _MenuScreenState();
 }
 
-class _MenuScreenState extends State<MenuScreen>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _animationController;
-  late Animation<double> _animation;
+class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
+  late AnimationController _idleAnimationController;
+  late AnimationController _scaleAnimationController;
+  late Animation<double> _idleAnimation;
+  late Animation<double> _scaleAnimation;
 
   @override
   void initState() {
     super.initState();
-    _animationController = AnimationController(
+
+    _scaleAnimationController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 2),
+    );
+
+    _idleAnimationController = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 1),
-    )..repeat(reverse: true);
-    _animation = Tween<double>(begin: 0, end: 20).animate(_animationController);
+    );
+
+    _scaleAnimation = Tween<double>(begin: 0, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _scaleAnimationController,
+        curve: Curves.easeInOutCirc,
+      ),
+    );
+    _idleAnimation = Tween<double>(begin: 0, end: 20).animate(CurvedAnimation(
+        parent: _idleAnimationController, curve: Curves.easeInOut));
+
+    // Start the scale animation
+    _scaleAnimationController.forward().whenComplete(() {
+      // Start the idle animation in a loop after the scale animation completes
+      _idleAnimationController.repeat(reverse: true);
+    });
   }
 
   @override
   void dispose() {
-    _animationController.dispose();
+    _scaleAnimationController.dispose();
+    _idleAnimationController.dispose();
     super.dispose();
   }
 
@@ -41,17 +63,21 @@ class _MenuScreenState extends State<MenuScreen>
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             AnimatedBuilder(
-              animation: _animation,
+              animation: Listenable.merge(
+                  [_scaleAnimationController, _idleAnimationController]),
               builder: (context, child) {
-                return Transform.translate(
-                  offset: Offset(0, _animation.value),
-                  child: child,
+                return Transform.scale(
+                  scale: _scaleAnimation.value,
+                  child: Transform.translate(
+                    offset: Offset(0, _idleAnimation.value),
+                    child: child,
+                  ),
                 );
               },
               child: Image.asset(
                 'images/game_logo.png',
-                width: 400,
-                height: 400,
+                width: 500,
+                height: 500,
               ),
             ),
             const SizedBox(height: 16),
