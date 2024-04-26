@@ -1,7 +1,9 @@
 import 'package:chanceshfit/credit_screen.dart';
 import 'package:chanceshfit/game_interface.dart';
 import 'package:chanceshfit/tutorial.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
 class MenuScreen extends StatefulWidget {
   const MenuScreen({super.key});
@@ -14,8 +16,10 @@ class MenuScreen extends StatefulWidget {
 class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
   late AnimationController _idleAnimationController;
   late AnimationController _scaleAnimationController;
+  late AnimationController _buttonAnimationController;
   late Animation<double> _idleAnimation;
   late Animation<double> _scaleAnimation;
+  late Animation<double> _buttonFadeAnimation;
 
   @override
   void initState() {
@@ -31,19 +35,33 @@ class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
       duration: const Duration(seconds: 1),
     );
 
+    _buttonAnimationController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 1),
+    );
+
     _scaleAnimation = Tween<double>(begin: 0, end: 1.0).animate(
       CurvedAnimation(
         parent: _scaleAnimationController,
         curve: Curves.easeInOutCirc,
       ),
     );
+
     _idleAnimation = Tween<double>(begin: 0, end: 20).animate(CurvedAnimation(
         parent: _idleAnimationController, curve: Curves.easeInOut));
+
+    _buttonFadeAnimation = Tween<double>(begin: 0, end: 20).animate(
+      CurvedAnimation(
+        parent: _buttonAnimationController,
+        curve: Curves.easeInOut,
+      ),
+    );
 
     // Start the scale animation
     _scaleAnimationController.forward().whenComplete(() {
       // Start the idle animation in a loop after the scale animation completes
       _idleAnimationController.repeat(reverse: true);
+      _buttonAnimationController.forward();
     });
   }
 
@@ -51,6 +69,7 @@ class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
   void dispose() {
     _scaleAnimationController.dispose();
     _idleAnimationController.dispose();
+    _buttonAnimationController.dispose();
     super.dispose();
   }
 
@@ -81,74 +100,110 @@ class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
               ),
             ),
             const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: () {
-                // Handle Start button press
-                Navigator.push(
-                  context,
-                  PageRouteBuilder(
-                    transitionDuration: const Duration(milliseconds: 500),
-                    pageBuilder: (context, animation, secondaryAnimation) =>
-                        FadeTransition(
-                      opacity: animation,
-                      child: const GameInterface(),
-                    ),
-                  ),
+            AnimatedBuilder(
+              animation: _buttonAnimationController,
+              builder: (context, child) {
+                return Opacity(
+                  opacity: _buttonFadeAnimation.value / 20,
+                  child: child,
                 );
               },
-              child: const Text(
-                'Demo Game',
-                style: TextStyle(
-                  fontSize: 30,
-                  color: Colors.white,
+              child: ElevatedButton(
+                onPressed: () {
+                  if (!_buttonAnimationController.isCompleted) {
+                    return;
+                  }
+                  // Handle Start button press
+                  Navigator.push(
+                    context,
+                    PageRouteBuilder(
+                      transitionDuration: const Duration(milliseconds: 500),
+                      pageBuilder: (context, animation, secondaryAnimation) =>
+                          FadeTransition(
+                        opacity: animation,
+                        child: const GameInterface(),
+                      ),
+                    ),
+                  );
+                },
+                child: const Text(
+                  'Demo Game',
+                  style: TextStyle(
+                    fontSize: 30,
+                    color: Colors.white,
+                  ),
                 ),
               ),
             ),
             const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: () {
-                // Handle Credits button press
-                Navigator.push(
-                  context,
-                  PageRouteBuilder(
-                    transitionDuration: const Duration(milliseconds: 500),
-                    pageBuilder: (context, animation, secondaryAnimation) =>
-                        FadeTransition(
-                      opacity: animation,
-                      child: const TutorialWidget(),
-                    ),
-                  ),
+            AnimatedBuilder(
+              animation: _buttonAnimationController,
+              builder: (context, child) {
+                return Opacity(
+                  opacity: _buttonFadeAnimation.value / 20,
+                  child: child,
                 );
               },
-              child: const Text(
-                'Tutorial',
-                style: TextStyle(
-                  fontSize: 25,
-                  color: Colors.white,
+              child: ElevatedButton(
+                onPressed: () {
+                  if (!_buttonAnimationController.isCompleted) {
+                    return;
+                  }
+                  // Handle Credits button press
+                  Navigator.push(
+                    context,
+                    PageRouteBuilder(
+                      transitionDuration: const Duration(milliseconds: 500),
+                      pageBuilder: (context, animation, secondaryAnimation) =>
+                          FadeTransition(
+                        opacity: animation,
+                        child: const TutorialWidget(),
+                      ),
+                    ),
+                  );
+                },
+                child: const Text(
+                  'Tutorial',
+                  style: TextStyle(
+                    fontSize: 25,
+                    color: Colors.white,
+                  ),
                 ),
               ),
             ),
             const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: () {
-                // Handle Credits button press
-                Navigator.push(
-                  context,
-                  PageRouteBuilder(
-                    transitionDuration: const Duration(milliseconds: 500),
-                    pageBuilder: (context, animation, secondaryAnimation) =>
-                        FadeTransition(
-                      opacity: animation,
-                      child: const CreditScreen(),
-                    ),
-                  ),
+            AnimatedBuilder(
+              animation: _buttonAnimationController,
+              builder: (context, child) {
+                return Opacity(
+                  opacity: _buttonFadeAnimation.value / 20,
+                  child: child,
                 );
               },
-              child: const Text(
-                'Credits',
-                style: TextStyle(
-                  fontSize: 25,
-                  color: Colors.white,
+              child: ElevatedButton(
+                onPressed: () {
+                  if (!_buttonAnimationController.isCompleted) {
+                    return;
+                  }
+                  // Handle Credits button press
+                  Navigator.push(
+                    context,
+                    PageRouteBuilder(
+                      transitionDuration: const Duration(milliseconds: 500),
+                      pageBuilder: (context, animation, secondaryAnimation) =>
+                          FadeTransition(
+                        opacity: animation,
+                        child: const CreditScreen(),
+                      ),
+                    ),
+                  );
+                },
+                child: const Text(
+                  'Credits',
+                  style: TextStyle(
+                    fontSize: 25,
+                    color: Colors.white,
+                  ),
                 ),
               ),
             ),
