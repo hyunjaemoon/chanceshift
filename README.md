@@ -1,6 +1,8 @@
 # ChanceShift
 Arcade Game with Randomness Chaos
 
+![ChanceShift Logo](demo/chanceshift_title.gif)
+
 # How to Build
 
 ## Prerequisites
