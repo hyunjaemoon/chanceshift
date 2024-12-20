@@ -40,7 +40,7 @@ class _GameInterfaceState extends State<GameInterface>
   Set<int> usedCardIndices = {};
   Future<CardList>? cardsFuture;
 
-  AudioPlayer _audioPlayer = AudioPlayer();
+  final AudioPlayer _audioPlayer = AudioPlayer();
 
   AnimationController? _controller;
   // ignore: unused_field

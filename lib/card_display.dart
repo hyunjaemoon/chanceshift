@@ -106,7 +106,7 @@ class CardSmallDisplayScreen extends StatelessWidget {
 }
 
 class CardDisplayScreen extends StatefulWidget {
-  const CardDisplayScreen({Key? key, required this.cardInfo});
+  const CardDisplayScreen({super.key, required this.cardInfo});
 
   final CardInfo cardInfo;
 
