@@ -1,52 +1,30 @@
-import 'package:chanceshfit/ui.dart';
+// This is a basic Flutter widget test.
+//
+// To perform an interaction with a widget in your test, use the WidgetTester
+// utility in the flutter_test package. For example, you can send tap and scroll
+// gestures. You can also use WidgetTester to find child widgets in the widget
+// tree, read text, and verify that the values of widget properties are correct.
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:chanceshfit/game_interface.dart';
+
+import 'package:chanceshift/main.dart';
 
 void main() {
-  // Create a group for all related tests
-  group('GameInterface tests', () {
-    // Test to ensure the game initializes correctly
-    testWidgets('Initial state is set correctly', (WidgetTester tester) async {
-      await tester.pumpWidget(MaterialApp(home: GameInterface()));
-      // Verify initial conditions
-      expect(find.text('Enemy HP: 5'), findsOneWidget);
-      expect(find.text('Remaining Chances: 5'), findsOneWidget);
-      expect(find.text('Chance Percent: 50'), findsOneWidget);
-      expect(find.text('Attack Number: 1'), findsOneWidget);
-    });
+  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
+    // Build our app and trigger a frame.
+    await tester.pumpWidget(const MyApp());
 
-    // Test to ensure that the chance percentage increases with a card selection
-    testWidgets('Selecting a card updates chance percentage and attack number',
-        (WidgetTester tester) async {
-      await tester.pumpWidget(MaterialApp(home: GameInterface()));
-      // Assuming there's a way to mock or simulate loading card list
-      await tester.pumpAndSettle(); // Wait for cards
+    // Verify that our counter starts at 0.
+    expect(find.text('0'), findsOneWidget);
+    expect(find.text('1'), findsNothing);
 
-      // Simulate selecting a card which increases chance by 10 and attack by 1
-      await tester.tap(find.byType(FilterChip).first);
-      await tester.pump(); // Rebuild the widget with new state
+    // Tap the '+' icon and trigger a frame.
+    await tester.tap(find.byIcon(Icons.add));
+    await tester.pump();
 
-      // Verify the changes
-      expect(find.text('Chance Percent: 75'),
-          findsOneWidget); // Assuming first card adds 25 to chance
-      expect(find.text('Attack Number: 1'),
-          findsOneWidget); // Assuming first card adds no change to attack
-    });
-
-    // Test to ensure that the 'Attack' button behaves correctly
-    testWidgets('Performing an attack decreases chances and handles HP',
-        (WidgetTester tester) async {
-      await tester.pumpWidget(MaterialApp(home: GameInterface()));
-      // Simulate an attack
-      await tester.tap(find.widgetWithText(PushButton, 'Attack'));
-      await tester.pump(); // Rebuild the widget to reflect state changes
-
-      // Verify the results of an attack
-      expect(find.text('Remaining Chances: 4'),
-          findsOneWidget); // Chances decrease by 1
-      // Check SnackBar for attack result, assuming random attack success
-      expect(find.byType(SnackBar), findsOneWidget);
-    });
+    // Verify that our counter has incremented.
+    expect(find.text('0'), findsNothing);
+    expect(find.text('1'), findsOneWidget);
   });
 }

@@ -3,17 +3,17 @@
 <plist version="1.0">
 <dict>
 	<key>API_KEY</key>
-	<string>AIzaSyCi33snoDnsf540d7pprvqqA34uokv9mBs</string>
+	<string>AIzaSyCeAyY6__XMuN-bqfL9zt1QnrGC7FZpZ0o</string>
 	<key>GCM_SENDER_ID</key>
-	<string>746779354872</string>
+	<string>874219386608</string>
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>com.example.chanceshfit</string>
+	<string>com.example.chanceshift</string>
 	<key>PROJECT_ID</key>
-	<string>chanceshift-moonsaga</string>
+	<string>chanceshift-moon</string>
 	<key>STORAGE_BUCKET</key>
-	<string>chanceshift-moonsaga.appspot.com</string>
+	<string>chanceshift-moon.firebasestorage.app</string>
 	<key>IS_ADS_ENABLED</key>
 	<false></false>
 	<key>IS_ANALYTICS_ENABLED</key>
@@ -25,6 +25,6 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:746779354872:ios:86fc782ed219eb652cbd0d</string>
+	<string>1:874219386608:ios:7fcab88d5904fcc5b2b435</string>
 </dict>
 </plist>

@@ -1,21 +1,21 @@
 {
   "project_info": {
-    "project_number": "746779354872",
-    "project_id": "chanceshift-moonsaga",
-    "storage_bucket": "chanceshift-moonsaga.appspot.com"
+    "project_number": "874219386608",
+    "project_id": "chanceshift-moon",
+    "storage_bucket": "chanceshift-moon.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:746779354872:android:57e678128e90f47e2cbd0d",
+        "mobilesdk_app_id": "1:874219386608:android:6e67094ef09242c6b2b435",
         "android_client_info": {
-          "package_name": "com.example.chanceshfit"
+          "package_name": "com.example.chanceshift"
         }
       },
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyBfnsyyiNE0TZvOSLVFsxE3MA4i2NmKxsI"
+          "current_key": "AIzaSyCgh_CKXWkJQg-5AcTz1eRIipQqwvFvrD4"
         }
       ],
       "services": {
