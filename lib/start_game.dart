@@ -8,22 +8,90 @@ import 'chanceshfit_logic.dart';
 import 'audio_manager.dart';
 
 class BinaryBox extends flame.PositionComponent {
-  final bool isOne;
-  final Paint _paint;
+  bool isOne;
+  Paint _paint;
+  double _animationProgress = 0;
+  bool _isAnimating = false;
+  static const double _animationDuration = 0.3;
+  final int number;
+  final TextPainter _textPainter;
 
   BinaryBox({
     required super.position,
     required super.size,
     required this.isOne,
-  }) : _paint = Paint()
+    required this.number,
+  })  : _paint = Paint()
           ..color = isOne ? Colors.green : Colors.grey
-          ..style = PaintingStyle.fill;
+          ..style = PaintingStyle.fill,
+        _textPainter = TextPainter(
+          text: TextSpan(
+            text: number.toString(),
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          textDirection: TextDirection.ltr,
+        ) {
+    _textPainter.layout();
+  }
+
+  void animateToNewState(bool newState) {
+    _isAnimating = true;
+    _animationProgress = 0;
+    isOne = newState;
+  }
+
+  @override
+  void update(double dt) {
+    super.update(dt);
+    if (_isAnimating) {
+      _animationProgress += dt / _animationDuration;
+      if (_animationProgress >= 1) {
+        _animationProgress = 1;
+        _isAnimating = false;
+      }
+
+      // Calculate intermediate color
+      final startColor = _animationProgress < 0.5 ? Colors.grey : Colors.green;
+      final endColor = _animationProgress < 0.5
+          ? Colors.green
+          : (isOne ? Colors.green : Colors.grey);
+      final progress = _animationProgress < 0.5
+          ? _animationProgress * 2
+          : (_animationProgress - 0.5) * 2;
+
+      _paint.color = Color.lerp(startColor, endColor, progress)!;
+    }
+  }
 
   @override
   void render(ui.Canvas canvas) {
+    // Add a glow effect when animating
+    if (_isAnimating) {
+      final glowPaint = Paint()
+        ..color = _paint.color.withAlpha(76)
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 10);
+      canvas.drawRect(
+        Rect.fromLTWH(-5, -5, size.x + 10, size.y + 10),
+        glowPaint,
+      );
+    }
+
     canvas.drawRect(
       Rect.fromLTWH(0, 0, size.x, size.y),
       _paint,
+    );
+
+    // Center the text in the box
+    _textPainter.paint(
+      canvas,
+      Offset(
+        (size.x - _textPainter.width) / 2,
+        (size.y - _textPainter.height) / 2,
+      ),
     );
   }
 }
@@ -68,6 +136,11 @@ class StartGame extends flame.FlameGame with flame.TapCallbacks {
   BuildContext? _context;
   Function(String)? onAnswerSubmitted;
   ChanceShiftLogic? _chanceShiftLogic;
+  List<BinaryBox> _binaryBoxes = [];
+  int _currentAnimationIndex = 0;
+  double _animationDelay = 0;
+  static const double _animationDelayDuration = 0.2;
+  bool _isAnimating = false;
 
   void setContext(BuildContext context) {
     _context = context;
@@ -84,12 +157,15 @@ class StartGame extends flame.FlameGame with flame.TapCallbacks {
   Future<void> handleUserInput(String input) async {
     if (_chanceShiftLogic != null) {
       final result = await _chanceShiftLogic!.query(input);
-      // Update the binary sequence with the output
+      // Start the sequential animation
+      _currentAnimationIndex = 0;
+      _animationDelay = 0;
+      _isAnimating = true;
+
+      // Store the new sequence
       for (int i = 0; i < binarySequence.length; i++) {
         binarySequence[i] = result["output"]![i] == 1;
       }
-      // Trigger a rebuild of the boxes
-      onLoad();
     }
   }
 
@@ -97,25 +173,30 @@ class StartGame extends flame.FlameGame with flame.TapCallbacks {
   Future<void> onLoad() async {
     await super.onLoad();
 
+    // Clear existing boxes
+    _binaryBoxes.clear();
+    removeAll(children);
+
     // Add binary boxes
     final boxSize = flame.Vector2(40, 40);
     final spacing = 10.0;
-    final startX = (size.x - (boxSize.x * 5 + spacing * 4)) / 2;
-    final startY = size.y / 3;
+    final startX = (size.x - boxSize.x) / 2; // Center horizontally
+    final startY = size.y / 6; // Start from top 1/6 of the screen
 
     for (int i = 0; i < binarySequence.length; i++) {
-      final row = i ~/ 5;
-      final col = i % 5;
       final position = flame.Vector2(
-        startX + (boxSize.x + spacing) * col,
-        startY + (boxSize.y + spacing) * row,
+        startX,
+        startY + (boxSize.y + spacing) * i,
       );
 
-      add(BinaryBox(
+      final box = BinaryBox(
         position: position,
         size: boxSize,
         isOne: binarySequence[i],
-      ));
+        number: i + 1, // Add number from 1 to 10
+      );
+      _binaryBoxes.add(box);
+      add(box);
     }
   }
 
@@ -124,6 +205,21 @@ class StartGame extends flame.FlameGame with flame.TapCallbacks {
     super.update(dt);
     _time += dt;
     _particleSpawnTimer += dt;
+
+    // Handle sequential box animations
+    if (_isAnimating) {
+      _animationDelay += dt;
+      if (_animationDelay >= _animationDelayDuration) {
+        _animationDelay = 0;
+        if (_currentAnimationIndex < _binaryBoxes.length) {
+          _binaryBoxes[_currentAnimationIndex]
+              .animateToNewState(binarySequence[_currentAnimationIndex]);
+          _currentAnimationIndex++;
+        } else {
+          _isAnimating = false;
+        }
+      }
+    }
 
     // Spawn particles at regular intervals
     while (_particleSpawnTimer >= _particleSpawnInterval) {
