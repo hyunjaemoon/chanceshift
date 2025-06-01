@@ -1,16 +1,11 @@
-# chanceshift
+# ChanceShift
 
-A new Flutter project.
+A text to algorithm game for hitting the right numbers.
 
-## Getting Started
+[Example Demo](https://drive.google.com/file/d/1mM2zYY-nilbZR9AAlIPU85fjLR4hJYgB/view?usp=sharing)
 
-This project is a starting point for a Flutter application.
+## Author
 
-A few resources to get you started if this is your first Flutter project:
+Hyun Jae Moon
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+calhyunjaemoon@gmail.com
