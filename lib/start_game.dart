@@ -141,6 +141,7 @@ class StartGame extends flame.FlameGame with flame.TapCallbacks {
   double _animationDelay = 0;
   static const double _animationDelayDuration = 0.2;
   bool _isAnimating = false;
+  final _audioManager = AudioManager();
 
   void setContext(BuildContext context) {
     _context = context;
@@ -156,6 +157,7 @@ class StartGame extends flame.FlameGame with flame.TapCallbacks {
 
   Future<void> handleUserInput(String input) async {
     if (_chanceShiftLogic != null) {
+      _audioManager.playWhoosh(); // Play whoosh sound when user submits answer
       final result = await _chanceShiftLogic!.query(input);
       // Start the sequential animation
       _currentAnimationIndex = 0;
@@ -172,6 +174,7 @@ class StartGame extends flame.FlameGame with flame.TapCallbacks {
   @override
   Future<void> onLoad() async {
     await super.onLoad();
+    await _audioManager.initialize();
 
     // Clear existing boxes
     _binaryBoxes.clear();
@@ -212,8 +215,12 @@ class StartGame extends flame.FlameGame with flame.TapCallbacks {
       if (_animationDelay >= _animationDelayDuration) {
         _animationDelay = 0;
         if (_currentAnimationIndex < _binaryBoxes.length) {
-          _binaryBoxes[_currentAnimationIndex]
-              .animateToNewState(binarySequence[_currentAnimationIndex]);
+          final box = _binaryBoxes[_currentAnimationIndex];
+          final newState = binarySequence[_currentAnimationIndex];
+          box.animateToNewState(newState);
+          if (newState) {
+            _audioManager.playHit();
+          }
           _currentAnimationIndex++;
         } else {
           _isAnimating = false;

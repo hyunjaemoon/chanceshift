@@ -7,6 +7,8 @@ class AudioManager {
   AudioManager._internal();
 
   final AudioPlayer _audioPlayer = AudioPlayer();
+  final AudioPlayer _hitPlayer = AudioPlayer();
+  final AudioPlayer _whooshPlayer = AudioPlayer();
   bool _isInitialized = false;
   bool _isMuted = true;
 
@@ -18,8 +20,27 @@ class AudioManager {
       await _audioPlayer.setVolume(0.5);
       await _audioPlayer.setReleaseMode(ReleaseMode.loop);
       await _audioPlayer.pause();
+
+      await _hitPlayer.setSource(AssetSource('audio/hit.wav'));
+      await _hitPlayer.setVolume(0.5);
+
+      await _whooshPlayer.setSource(AssetSource('audio/whoosh.mp3'));
+      await _whooshPlayer.setVolume(0.5);
+
       _isInitialized = true;
     }
+  }
+
+  Future<void> playHit() async {
+    if (!_isInitialized || _isMuted) return;
+    await _hitPlayer.seek(Duration.zero);
+    await _hitPlayer.resume();
+  }
+
+  Future<void> playWhoosh() async {
+    if (!_isInitialized || _isMuted) return;
+    await _whooshPlayer.seek(Duration.zero);
+    await _whooshPlayer.resume();
   }
 
   Future<void> toggleMute() async {
@@ -35,5 +56,7 @@ class AudioManager {
 
   Future<void> dispose() async {
     await _audioPlayer.dispose();
+    await _hitPlayer.dispose();
+    await _whooshPlayer.dispose();
   }
 }
