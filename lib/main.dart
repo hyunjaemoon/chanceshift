@@ -2,7 +2,6 @@ import 'package:firebase_ai/firebase_ai.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_vertexai/firebase_vertexai.dart';
 import 'firebase_options.dart';
 import 'intro_game.dart';
 import 'chanceshfit_logic.dart';
@@ -68,31 +67,16 @@ class _MyAppState extends State<MyApp> {
     );
 
     try {
-      if (useVertexBackend) {
-        final vertexInstance =
-            FirebaseVertexAI.instanceFor(auth: FirebaseAuth.instance);
-        _currentModel =
-            vertexInstance.generativeModel(model: 'gemini-2.0-flash');
-        _currentImagenModel = vertexInstance.imagenModel(
-          model: 'imagen-3.0-generate-001',
-          generationConfig: generationConfig,
-          safetySettings: ImagenSafetySettings(
-            ImagenSafetyFilterLevel.blockLowAndAbove,
-            ImagenPersonFilterLevel.allowAdult,
-          ),
-        );
-      } else {
-        final googleAI = FirebaseAI.googleAI(auth: FirebaseAuth.instance);
-        _currentModel = googleAI.generativeModel(model: 'gemini-2.0-flash');
-        _currentImagenModel = googleAI.imagenModel(
-          model: 'imagen-3.0-generate-001',
-          generationConfig: generationConfig,
-          safetySettings: ImagenSafetySettings(
-            ImagenSafetyFilterLevel.blockLowAndAbove,
-            ImagenPersonFilterLevel.allowAdult,
-          ),
-        );
-      }
+      final googleAI = FirebaseAI.googleAI(auth: FirebaseAuth.instance);
+      _currentModel = googleAI.generativeModel(model: 'gemini-2.0-flash');
+      _currentImagenModel = googleAI.imagenModel(
+        model: 'imagen-3.0-generate-001',
+        generationConfig: generationConfig,
+        safetySettings: ImagenSafetySettings(
+          ImagenSafetyFilterLevel.blockLowAndAbove,
+          ImagenPersonFilterLevel.allowAdult,
+        ),
+      );
     } catch (e) {
       throw Exception('Failed to initialize AI models: $e');
     }

@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'dart:ui' as ui;
 import 'dart:math' as math;
 import 'chanceshfit_logic.dart';
+import 'audio_manager.dart';
 
 class BinaryBox extends flame.PositionComponent {
   final bool isOne;
@@ -58,8 +59,7 @@ class MovingParticle extends flame.CircleComponent with flame.HasGameReference {
 }
 
 class StartGame extends flame.FlameGame with flame.TapCallbacks {
-  final List<bool> binarySequence =
-      List.generate(10, (index) => index % 2 == 0);
+  final List<bool> binarySequence = List.generate(10, (_) => false);
   final TextEditingController _textController = TextEditingController();
   double _time = 0;
   final _random = math.Random();
@@ -171,6 +171,7 @@ class _StartGamePageState extends State<StartGamePage> {
   final TextEditingController _textController = TextEditingController();
   late StartGame _game;
   final FocusNode _focusNode = FocusNode();
+  final _audioManager = AudioManager();
 
   @override
   void initState() {
@@ -193,56 +194,76 @@ class _StartGamePageState extends State<StartGamePage> {
       backgroundColor: Colors.black,
       resizeToAvoidBottomInset: true,
       body: SafeArea(
-        child: Column(
+        child: Stack(
           children: [
-            Expanded(
-              child: GestureDetector(
-                onTap: () => _focusNode.unfocus(),
-                child: flame.GameWidget(
-                  game: _game,
-                ),
-              ),
-            ),
-            Container(
-              color: Colors.black.withOpacity(0.8),
-              padding: EdgeInsets.only(
-                left: 16.0,
-                right: 16.0,
-                top: 16.0,
-                bottom: MediaQuery.of(context).viewInsets.bottom + 16.0,
-              ),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: TextField(
-                      controller: _textController,
-                      focusNode: _focusNode,
-                      style: const TextStyle(color: Colors.white),
-                      decoration: const InputDecoration(
-                        hintText: 'Enter your answer...',
-                        hintStyle: TextStyle(color: Colors.grey),
-                        border: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.white),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.white),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.white),
-                        ),
-                        contentPadding:
-                            EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                      ),
-                      onSubmitted: _handleAnswerSubmitted,
+            Column(
+              children: [
+                Expanded(
+                  child: GestureDetector(
+                    onTap: () => _focusNode.unfocus(),
+                    child: flame.GameWidget(
+                      game: _game,
                     ),
                   ),
-                  const SizedBox(width: 16),
-                  IconButton(
-                    icon: const Icon(Icons.send, color: Colors.white),
-                    onPressed: () =>
-                        _handleAnswerSubmitted(_textController.text),
+                ),
+                Container(
+                  color: Colors.black.withOpacity(0.8),
+                  padding: EdgeInsets.only(
+                    left: 16.0,
+                    right: 16.0,
+                    top: 16.0,
+                    bottom: MediaQuery.of(context).viewInsets.bottom + 16.0,
                   ),
-                ],
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: TextField(
+                          controller: _textController,
+                          focusNode: _focusNode,
+                          style: const TextStyle(color: Colors.white),
+                          decoration: const InputDecoration(
+                            hintText: 'Enter your answer...',
+                            hintStyle: TextStyle(color: Colors.grey),
+                            border: OutlineInputBorder(
+                              borderSide: BorderSide(color: Colors.white),
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderSide: BorderSide(color: Colors.white),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderSide: BorderSide(color: Colors.white),
+                            ),
+                            contentPadding: EdgeInsets.symmetric(
+                                horizontal: 16, vertical: 12),
+                          ),
+                          onSubmitted: _handleAnswerSubmitted,
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      IconButton(
+                        icon: const Icon(Icons.send, color: Colors.white),
+                        onPressed: () =>
+                            _handleAnswerSubmitted(_textController.text),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            Positioned(
+              top: 16,
+              right: 16,
+              child: IconButton(
+                icon: Icon(
+                  _audioManager.isMuted ? Icons.volume_off : Icons.volume_up,
+                  color: Colors.white,
+                  size: 32,
+                ),
+                onPressed: () {
+                  setState(() {
+                    _audioManager.toggleMute();
+                  });
+                },
               ),
             ),
           ],

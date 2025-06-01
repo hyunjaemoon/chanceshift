@@ -1,4 +1,5 @@
 import 'package:chanceshift/chanceshfit_logic.dart';
+import 'package:chanceshift/audio_manager.dart';
 import 'package:flame/game.dart' as flame;
 import 'package:flame/components.dart' as flame;
 import 'package:flame/events.dart' as flame;
@@ -176,8 +177,7 @@ class IntroGame extends flame.FlameGame {
   final _random = math.Random();
   double _particleSpawnTimer = 0;
   static const double _particleSpawnInterval = 0.05;
-  final _audioPlayer = AudioPlayer();
-  bool _isAudioInitialized = false;
+  final _audioManager = AudioManager();
   BuildContext? _context;
   final ChanceShiftLogic chanceShiftLogic;
 
@@ -230,29 +230,12 @@ class IntroGame extends flame.FlameGame {
   @override
   Color backgroundColor() => Colors.black;
 
-  Future<void> _initializeAudio() async {
-    if (!_isAudioInitialized) {
-      await _audioPlayer.setSource(AssetSource('audio/chanceshift_theme.mp3'));
-      await _audioPlayer.setVolume(0.5);
-      await _audioPlayer.setReleaseMode(ReleaseMode.loop);
-      _isAudioInitialized = true;
-    }
-  }
-
-  Future<void> _startAudio() async {
-    await _initializeAudio();
-    await _audioPlayer.resume();
-  }
-
   @override
   Future<void> onLoad() async {
     await super.onLoad();
 
-    // Initialize audio for mobile platforms
-    if (!kIsWeb) {
-      await _initializeAudio();
-      await _startAudio();
-    }
+    // Initialize audio
+    await _audioManager.initialize();
 
     // Add the floating title sprite
     final titleSprite = FloatingTitle(
@@ -281,20 +264,17 @@ class IntroGame extends flame.FlameGame {
     final demoImage = await loadSprite('demo.png');
     final demoImageComponent = flame.SpriteComponent(
       sprite: demoImage,
-      size: flame.Vector2(50, 20), // Stretched horizontally to match logo width
+      size: flame.Vector2(50, 20),
       position: flame.Vector2(
-        size.x / 2 - 25, // Center horizontally (half of width)
-        titleSprite.position.y +
-            titleSprite.size.y +
-            -20, // Place 10 pixels below logo
+        size.x / 2 - 25,
+        titleSprite.position.y + titleSprite.size.y + -20,
       ),
     );
     add(demoImageComponent);
 
     // Calculate button positions based on demo image position
-    final buttonY = demoImageComponent.position.y +
-        demoImageComponent.size.y +
-        20; // Keep 20 pixels gap from demo image
+    final buttonY =
+        demoImageComponent.position.y + demoImageComponent.size.y + 20;
 
     // Add start game button
     final startGameButton = ButtonComponent(
@@ -302,7 +282,6 @@ class IntroGame extends flame.FlameGame {
       position: flame.Vector2(size.x / 2 - 100, buttonY),
       size: flame.Vector2(200, 60),
       onTap: () async {
-        await _startAudio();
         if (_context != null) {
           Navigator.of(_context!).push(
             MaterialPageRoute(
@@ -322,7 +301,6 @@ class IntroGame extends flame.FlameGame {
       position: flame.Vector2(size.x / 2 - 100, buttonY + 70),
       size: flame.Vector2(200, 60),
       onTap: () async {
-        await _startAudio();
         _showCreditsDialog();
       },
     );
@@ -341,20 +319,18 @@ class IntroGame extends flame.FlameGame {
 
       // Spawn multiple particles at once for a more continuous effect
       for (int i = 0; i < 5; i++) {
-        // Increased number of particles
         final particle = MovingParticle(
           position: flame.Vector2(
             _random.nextDouble() * size.x,
-            size.y + 10, // Start slightly below the screen
+            size.y + 10,
           ),
           velocity: flame.Vector2(
-            (_random.nextDouble() - 0.5) * 150, // Increased horizontal spread
-            -_random.nextDouble() * 300 - 100, // Increased upward velocity
+            (_random.nextDouble() - 0.5) * 150,
+            -_random.nextDouble() * 300 - 100,
           ),
-          lifetime: _random.nextDouble() * 3 + 2, // Increased lifetime
-          radius: _random.nextDouble() * 2 + 1, // Varied particle sizes
-          paint: Paint()
-            ..color = Colors.white.withOpacity(0.7), // Increased opacity
+          lifetime: _random.nextDouble() * 3 + 2,
+          radius: _random.nextDouble() * 2 + 1,
+          paint: Paint()..color = Colors.white.withOpacity(0.7),
         );
 
         add(particle);
@@ -364,7 +340,7 @@ class IntroGame extends flame.FlameGame {
 
   @override
   void onRemove() {
-    _audioPlayer.dispose();
+    _audioManager.dispose();
     super.onRemove();
   }
 }
@@ -390,7 +366,33 @@ class _IntroPageState extends State<IntroPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: GameWithInputBanner(game: _game),
+      body: Stack(
+        children: [
+          GameWithInputBanner(game: _game),
+          SafeArea(
+            child: Align(
+              alignment: Alignment.topRight,
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: IconButton(
+                  icon: Icon(
+                    _game._audioManager.isMuted
+                        ? Icons.volume_off
+                        : Icons.volume_up,
+                    color: Colors.white,
+                    size: 32,
+                  ),
+                  onPressed: () {
+                    setState(() {
+                      _game._audioManager.toggleMute();
+                    });
+                  },
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
