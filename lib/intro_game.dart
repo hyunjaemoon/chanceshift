@@ -1,11 +1,14 @@
+import 'package:chanceshift/chanceshfit_logic.dart';
 import 'package:flame/game.dart' as flame;
 import 'package:flame/components.dart' as flame;
 import 'package:flame/events.dart' as flame;
+import 'package:flame/game.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'dart:math' as math;
 import 'dart:ui' as ui;
+import 'start_game.dart';
 
 class FloatingTitle extends flame.SpriteComponent with flame.HasGameReference {
   double _time = 0;
@@ -125,6 +128,49 @@ class ButtonComponent extends flame.SpriteComponent
   }
 }
 
+class FloatingDemoImage extends flame.SpriteComponent
+    with flame.HasGameReference {
+  double _time = 0;
+  final double _amplitude = 10;
+  final double _frequency = 2;
+
+  FloatingDemoImage({
+    required flame.Sprite sprite,
+    required flame.Vector2 size,
+    required flame.Vector2 position,
+  }) : super(sprite: sprite, size: size, position: position);
+
+  @override
+  void update(double dt) {
+    super.update(dt);
+    _time += dt;
+    position.y = position.y + math.sin(_time * _frequency) * _amplitude * dt;
+  }
+}
+
+class CreditsDisplay extends flame.TextComponent with flame.HasGameReference {
+  CreditsDisplay()
+      : super(
+          text: '© ${DateTime.now().year} Hyun Jae Moon\nAll Rights Reserved',
+          textRenderer: flame.TextPaint(
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        );
+
+  @override
+  Future<void> onLoad() async {
+    super.onLoad();
+    position = flame.Vector2(
+      game.size.x / 2 - 150,
+      game.size.y / 2 - 50,
+    );
+  }
+}
+
 class IntroGame extends flame.FlameGame {
   double _time = 0;
   final _random = math.Random();
@@ -132,6 +178,54 @@ class IntroGame extends flame.FlameGame {
   static const double _particleSpawnInterval = 0.05;
   final _audioPlayer = AudioPlayer();
   bool _isAudioInitialized = false;
+  BuildContext? _context;
+  final ChanceShiftLogic chanceShiftLogic;
+
+  IntroGame({required this.chanceShiftLogic});
+
+  void setContext(BuildContext context) {
+    _context = context;
+  }
+
+  void _showCreditsDialog() {
+    if (_context != null) {
+      showDialog(
+        context: _context!,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            backgroundColor: Colors.black.withAlpha(230),
+            title: const Text(
+              'Credits',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            content: Text(
+              '© ${DateTime.now().year} Hyun Jae Moon\nAll Rights Reserved',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 18,
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text(
+                  'Close',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                  ),
+                ),
+              ),
+            ],
+          );
+        },
+      );
+    }
+  }
 
   @override
   Color backgroundColor() => Colors.black;
@@ -181,13 +275,26 @@ class IntroGame extends flame.FlameGame {
       size.x / 2 - targetWidth / 2,
       size.y / 3,
     );
-
     add(titleSprite);
 
-    // Calculate button positions based on title position
-    final buttonY = titleSprite.position.y +
-        titleSprite.size.y +
-        20; // Keep 20 pixels gap from logo
+    // Add demo image
+    final demoImage = await loadSprite('demo.png');
+    final demoImageComponent = flame.SpriteComponent(
+      sprite: demoImage,
+      size: flame.Vector2(50, 20), // Stretched horizontally to match logo width
+      position: flame.Vector2(
+        size.x / 2 - 25, // Center horizontally (half of width)
+        titleSprite.position.y +
+            titleSprite.size.y +
+            -20, // Place 10 pixels below logo
+      ),
+    );
+    add(demoImageComponent);
+
+    // Calculate button positions based on demo image position
+    final buttonY = demoImageComponent.position.y +
+        demoImageComponent.size.y +
+        20; // Keep 20 pixels gap from demo image
 
     // Add start game button
     final startGameButton = ButtonComponent(
@@ -196,8 +303,15 @@ class IntroGame extends flame.FlameGame {
       size: flame.Vector2(200, 60),
       onTap: () async {
         await _startAudio();
-        // TODO: Implement start game navigation
-        print('Start game tapped');
+        if (_context != null) {
+          Navigator.of(_context!).push(
+            MaterialPageRoute(
+              builder: (context) => StartGamePage(
+                chanceShiftLogic: this.chanceShiftLogic,
+              ),
+            ),
+          );
+        }
       },
     );
     add(startGameButton);
@@ -209,8 +323,7 @@ class IntroGame extends flame.FlameGame {
       size: flame.Vector2(200, 60),
       onTap: () async {
         await _startAudio();
-        // TODO: Implement credits navigation
-        print('Credits tapped');
+        _showCreditsDialog();
       },
     );
     add(creditsButton);
@@ -256,16 +369,46 @@ class IntroGame extends flame.FlameGame {
   }
 }
 
-class IntroPage extends StatelessWidget {
-  const IntroPage({super.key});
+class IntroPage extends StatefulWidget {
+  final ChanceShiftLogic chanceShiftLogic;
+  const IntroPage({super.key, required this.chanceShiftLogic});
+
+  @override
+  State<IntroPage> createState() => _IntroPageState();
+}
+
+class _IntroPageState extends State<IntroPage> {
+  late final IntroGame _game;
+
+  @override
+  void initState() {
+    super.initState();
+    _game = IntroGame(chanceShiftLogic: widget.chanceShiftLogic);
+    _game.setContext(context);
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
-      body: flame.GameWidget(
-        game: IntroGame(),
-      ),
+      body: GameWithInputBanner(game: _game),
+    );
+  }
+}
+
+class GameWithInputBanner extends StatelessWidget {
+  final IntroGame game;
+
+  const GameWithInputBanner({
+    super.key,
+    required this.game,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: MediaQuery.of(context).size.width,
+      height: MediaQuery.of(context).size.height,
+      child: GameWidget(game: game),
     );
   }
 }
