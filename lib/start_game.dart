@@ -126,7 +126,8 @@ class MovingParticle extends flame.CircleComponent with flame.HasGameReference {
   }
 }
 
-class StartGame extends flame.FlameGame with flame.TapCallbacks {
+class StartGame extends flame.FlameGame
+    with flame.TapCallbacks, ChangeNotifier {
   final List<bool> binarySequence = List.generate(10, (_) => false);
   final TextEditingController _textController = TextEditingController();
   double _time = 0;
@@ -142,6 +143,8 @@ class StartGame extends flame.FlameGame with flame.TapCallbacks {
   static const double _animationDelayDuration = 0.2;
   bool _isAnimating = false;
   final _audioManager = AudioManager();
+
+  bool get isAnimating => _isAnimating;
 
   void setContext(BuildContext context) {
     _context = context;
@@ -163,6 +166,7 @@ class StartGame extends flame.FlameGame with flame.TapCallbacks {
       _currentAnimationIndex = 0;
       _animationDelay = 0;
       _isAnimating = true;
+      notifyListeners(); // Notify listeners of animation state change
 
       // Store the new sequence
       for (int i = 0; i < binarySequence.length; i++) {
@@ -224,6 +228,7 @@ class StartGame extends flame.FlameGame with flame.TapCallbacks {
           _currentAnimationIndex++;
         } else {
           _isAnimating = false;
+          notifyListeners(); // Notify listeners of animation state change
         }
       }
     }
@@ -275,6 +280,10 @@ class _StartGamePageState extends State<StartGamePage> {
   late StartGame _game;
   final FocusNode _focusNode = FocusNode();
   final _audioManager = AudioManager();
+  String _prevPrevMessage = '';
+  String _prevMessage = '';
+  String _counterText = '0/50';
+  bool _isAnimating = false;
 
   @override
   void initState() {
@@ -283,12 +292,37 @@ class _StartGamePageState extends State<StartGamePage> {
       ..setContext(context)
       ..setChanceShiftLogic(widget.chanceShiftLogic)
       ..setOnAnswerSubmitted(_handleAnswerSubmitted);
+
+    _textController.addListener(() {
+      setState(() {
+        _counterText = '${_textController.text.length}/50';
+      });
+    });
+
+    // Add animation state listener
+    _game.addListener(() {
+      if (_isAnimating != _game.isAnimating) {
+        setState(() {
+          _isAnimating = _game.isAnimating;
+          if (_game.isAnimating) {
+            _focusNode.unfocus(); // Unfocus keyboard when animation starts
+          }
+        });
+      }
+    });
   }
 
   void _handleAnswerSubmitted(String answer) {
-    _game.handleUserInput(answer);
+    setState(() {
+      _isAnimating = true;
+    });
+    _game.handleUserInput('Both $_prevMessage & $answer');
     _textController.clear();
     _focusNode.unfocus();
+    setState(() {
+      _prevPrevMessage = _prevMessage;
+      _prevMessage = answer;
+    });
   }
 
   @override
@@ -304,11 +338,28 @@ class _StartGamePageState extends State<StartGamePage> {
                 Expanded(
                   child: GestureDetector(
                     onTap: () => _focusNode.unfocus(),
-                    child: flame.GameWidget(
-                      game: _game,
+                    child: AbsorbPointer(
+                      absorbing: _isAnimating,
+                      child: flame.GameWidget(
+                        game: _game,
+                      ),
                     ),
                   ),
                 ),
+                if (_prevPrevMessage.isEmpty && _prevMessage.isEmpty)
+                  const SizedBox.shrink()
+                else if (_prevPrevMessage.isEmpty)
+                  Text(
+                    _prevMessage,
+                    style: const TextStyle(color: Colors.white),
+                    textAlign: TextAlign.center,
+                  )
+                else
+                  Text(
+                    '$_prevPrevMessage & $_prevMessage',
+                    style: const TextStyle(color: Colors.white),
+                    textAlign: TextAlign.center,
+                  ),
                 Container(
                   color: Colors.black.withOpacity(0.8),
                   padding: EdgeInsets.only(
@@ -319,34 +370,65 @@ class _StartGamePageState extends State<StartGamePage> {
                   ),
                   child: Row(
                     children: [
-                      Expanded(
-                        child: TextField(
-                          controller: _textController,
-                          focusNode: _focusNode,
-                          style: const TextStyle(color: Colors.white),
-                          decoration: const InputDecoration(
-                            hintText: 'Enter your answer...',
-                            hintStyle: TextStyle(color: Colors.grey),
-                            border: OutlineInputBorder(
-                              borderSide: BorderSide(color: Colors.white),
-                            ),
-                            enabledBorder: OutlineInputBorder(
-                              borderSide: BorderSide(color: Colors.white),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderSide: BorderSide(color: Colors.white),
-                            ),
-                            contentPadding: EdgeInsets.symmetric(
-                                horizontal: 16, vertical: 12),
+                      if (_prevMessage.isNotEmpty && !_isAnimating)
+                        Container(
+                          constraints: BoxConstraints(
+                            maxWidth: MediaQuery.of(context).size.width * 0.4,
                           ),
-                          onSubmitted: _handleAnswerSubmitted,
+                          child: Text(
+                            '$_prevMessage & ',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                          ),
+                        ),
+                      Expanded(
+                        child: AbsorbPointer(
+                          absorbing: _isAnimating,
+                          child: TextField(
+                            controller: _textController,
+                            focusNode: _focusNode,
+                            style: const TextStyle(color: Colors.white),
+                            maxLength: 50,
+                            enabled: !_isAnimating,
+                            decoration: InputDecoration(
+                              hintText: _isAnimating
+                                  ? 'Processing...'
+                                  : 'Enter your answer...',
+                              hintStyle: const TextStyle(color: Colors.grey),
+                              border: const OutlineInputBorder(
+                                borderSide: BorderSide(color: Colors.white),
+                              ),
+                              enabledBorder: const OutlineInputBorder(
+                                borderSide: BorderSide(color: Colors.white),
+                              ),
+                              focusedBorder: const OutlineInputBorder(
+                                borderSide: BorderSide(color: Colors.white),
+                              ),
+                              contentPadding: const EdgeInsets.symmetric(
+                                  horizontal: 16, vertical: 12),
+                              counterText: _counterText,
+                              counterStyle: const TextStyle(color: Colors.grey),
+                            ),
+                            onSubmitted:
+                                _isAnimating ? null : _handleAnswerSubmitted,
+                          ),
                         ),
                       ),
                       const SizedBox(width: 16),
-                      IconButton(
-                        icon: const Icon(Icons.send, color: Colors.white),
-                        onPressed: () =>
-                            _handleAnswerSubmitted(_textController.text),
+                      AbsorbPointer(
+                        absorbing: _isAnimating,
+                        child: IconButton(
+                          icon: const Icon(Icons.send, color: Colors.white),
+                          onPressed: _isAnimating
+                              ? null
+                              : () {
+                                  _handleAnswerSubmitted(_textController.text);
+                                },
+                        ),
                       ),
                     ],
                   ),
@@ -357,11 +439,8 @@ class _StartGamePageState extends State<StartGamePage> {
               top: 16,
               right: 16,
               child: IconButton(
-                icon: Icon(
-                  _audioManager.isMuted ? Icons.volume_off : Icons.volume_up,
-                  color: Colors.white,
-                  size: 32,
-                ),
+                icon:
+                    const Icon(Icons.volume_up, color: Colors.white, size: 32),
                 onPressed: () {
                   setState(() {
                     _audioManager.toggleMute();

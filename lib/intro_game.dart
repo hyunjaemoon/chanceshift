@@ -4,9 +4,7 @@ import 'package:flame/game.dart' as flame;
 import 'package:flame/components.dart' as flame;
 import 'package:flame/events.dart' as flame;
 import 'package:flame/game.dart';
-import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
 import 'dart:math' as math;
 import 'dart:ui' as ui;
 import 'start_game.dart';
@@ -15,18 +13,21 @@ class FloatingTitle extends flame.SpriteComponent with flame.HasGameReference {
   double _time = 0;
   final double _amplitude = 10;
   final double _frequency = 2;
+  final double _baseY;
 
   FloatingTitle({
     required flame.Sprite sprite,
     required flame.Vector2 size,
     required flame.Vector2 position,
-  }) : super(sprite: sprite, size: size, position: position);
+  })  : _baseY = position.y,
+        super(sprite: sprite, size: size, position: position);
 
   @override
   void update(double dt) {
     super.update(dt);
     _time += dt;
-    position.y = game.size.y / 3 + math.sin(_time * _frequency) * _amplitude;
+    // Keep the floating animation within bounds
+    position.y = _baseY + math.sin(_time * _frequency) * _amplitude;
   }
 }
 
@@ -70,13 +71,15 @@ class ButtonComponent extends flame.SpriteComponent
   final double _floatAmplitude = 2.0;
   final double _floatFrequency = 1.5;
   final double _pressScale = 0.95;
+  final double _baseY;
 
   ButtonComponent({
     required this.onTap,
     required this.imagePath,
     required flame.Vector2 position,
     required flame.Vector2 size,
-  }) : super(position: position, size: size);
+  })  : _baseY = position.y,
+        super(position: position, size: size);
 
   @override
   Future<void> onLoad() async {
@@ -88,10 +91,11 @@ class ButtonComponent extends flame.SpriteComponent
     super.update(dt);
     _time += dt;
 
-    // Floating animation
+    // Floating animation with bounds checking
     if (!_isPressed) {
-      position.y =
-          position.y + math.sin(_time * _floatFrequency) * _floatAmplitude * dt;
+      final floatOffset =
+          math.sin(_time * _floatFrequency) * _floatAmplitude * dt;
+      position.y = _baseY + floatOffset;
     }
 
     // Scale animation
@@ -241,7 +245,8 @@ class IntroGame extends flame.FlameGame {
     final titleSprite = FloatingTitle(
       sprite: await loadSprite('chanceshift_title.png'),
       size: flame.Vector2(300, 100),
-      position: flame.Vector2(size.x / 2 - 150, size.y / 3),
+      position: flame.Vector2(
+          size.x / 2 - 150, size.y * 0.2), // Position at 20% from top
     );
 
     // Get the actual image dimensions
@@ -249,32 +254,35 @@ class IntroGame extends flame.FlameGame {
     final aspectRatio = image.width / image.height;
 
     // Adjust the size while maintaining aspect ratio
-    final targetWidth = 300.0;
+    final targetWidth =
+        math.min(300.0, size.x * 0.8); // Limit width to 80% of screen
     final targetHeight = targetWidth / aspectRatio;
     titleSprite.size = flame.Vector2(targetWidth, targetHeight);
 
     // Recalculate position to keep it centered horizontally
     titleSprite.position = flame.Vector2(
       size.x / 2 - targetWidth / 2,
-      size.y / 3,
+      size.y * 0.2, // Position at 20% from top
     );
     add(titleSprite);
 
-    // Add demo image
+    // Add demo image with adjusted positioning
     final demoImage = await loadSprite('demo.png');
     final demoImageComponent = flame.SpriteComponent(
       sprite: demoImage,
       size: flame.Vector2(50, 20),
       position: flame.Vector2(
         size.x / 2 - 25,
-        titleSprite.position.y + titleSprite.size.y + -20,
+        titleSprite.position.y + titleSprite.size.y + 20, // Add some spacing
       ),
     );
     add(demoImageComponent);
 
-    // Calculate button positions based on demo image position
-    final buttonY =
-        demoImageComponent.position.y + demoImageComponent.size.y + 20;
+    // Calculate button positions based on demo image position with proper spacing
+    final buttonY = demoImageComponent.position.y +
+        demoImageComponent.size.y +
+        40; // Increased spacing
+    final buttonSpacing = 80.0; // Increased spacing between buttons
 
     // Add start game button
     final startGameButton = ButtonComponent(
@@ -295,10 +303,10 @@ class IntroGame extends flame.FlameGame {
     );
     add(startGameButton);
 
-    // Add credits button
+    // Add credits button with adjusted spacing
     final creditsButton = ButtonComponent(
       imagePath: 'credits.png',
-      position: flame.Vector2(size.x / 2 - 100, buttonY + 70),
+      position: flame.Vector2(size.x / 2 - 100, buttonY + buttonSpacing),
       size: flame.Vector2(200, 60),
       onTap: () async {
         _showCreditsDialog();
