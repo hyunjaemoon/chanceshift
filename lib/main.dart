@@ -43,15 +43,40 @@ class _MyAppState extends State<MyApp> {
 
   Future<void> _initializeApp() async {
     try {
-      await _initializeModel(false);
-      _chanceShiftLogic = ChanceShiftLogic(
-        imageModel: _currentImagenModel,
-        generativeModel: _currentModel,
-      );
+      // Try to authenticate, but don't fail if auth is not configured
+      print('Checking authentication...');
+      try {
+        if (FirebaseAuth.instance.currentUser == null) {
+          print('No user authenticated, signing in anonymously...');
+          await FirebaseAuth.instance.signInAnonymously();
+          print('Anonymous authentication successful');
+        } else {
+          print(
+              'User already authenticated: ${FirebaseAuth.instance.currentUser?.uid}');
+        }
+      } catch (authError) {
+        print('Authentication failed, continuing without auth: $authError');
+        // Continue without authentication - Firebase AI might still work
+      }
+
+      try {
+        await _initializeModel(false);
+        _chanceShiftLogic = ChanceShiftLogic(
+          imageModel: _currentImagenModel,
+          generativeModel: _currentModel,
+        );
+        print('ChanceShiftLogic initialized with Firebase AI');
+      } catch (aiError) {
+        print('Firebase AI initialization failed: $aiError');
+        print('Initializing ChanceShiftLogic without AI services');
+        _chanceShiftLogic = ChanceShiftLogic();
+      }
+
       setState(() {
         _isInitialized = true;
       });
     } catch (e) {
+      print('Error in _initializeApp: $e');
       setState(() {
         _errorMessage = 'Error initializing app: $e';
       });
@@ -67,8 +92,23 @@ class _MyAppState extends State<MyApp> {
     );
 
     try {
-      final googleAI = FirebaseAI.googleAI(auth: FirebaseAuth.instance);
+      print('Initializing Firebase AI...');
+
+      // Try to initialize Firebase AI with auth if available
+      FirebaseAI googleAI;
+      try {
+        googleAI = FirebaseAI.googleAI(auth: FirebaseAuth.instance);
+        print('Firebase AI instance created with auth');
+      } catch (authError) {
+        print('Failed to initialize with auth, trying without: $authError');
+        // Try without authentication
+        googleAI = FirebaseAI.googleAI();
+        print('Firebase AI instance created without auth');
+      }
+
       _currentModel = googleAI.generativeModel(model: 'gemini-2.0-flash');
+      print('Generative model initialized: gemini-2.0-flash');
+
       _currentImagenModel = googleAI.imagenModel(
         model: 'imagen-3.0-generate-001',
         generationConfig: generationConfig,
@@ -77,7 +117,11 @@ class _MyAppState extends State<MyApp> {
           ImagenPersonFilterLevel.allowAdult,
         ),
       );
+      print('Imagen model initialized: imagen-3.0-generate-001');
     } catch (e) {
+      print('Error initializing AI models: $e');
+      print('Error type: ${e.runtimeType}');
+      print('Stack trace: ${StackTrace.current}');
       throw Exception('Failed to initialize AI models: $e');
     }
   }

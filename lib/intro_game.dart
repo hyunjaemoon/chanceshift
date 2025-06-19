@@ -302,17 +302,6 @@ class IntroGame extends flame.FlameGame {
       },
     );
     add(startGameButton);
-
-    // Add credits button with adjusted spacing
-    final creditsButton = ButtonComponent(
-      imagePath: 'credits.png',
-      position: flame.Vector2(size.x / 2 - 100, buttonY + buttonSpacing),
-      size: flame.Vector2(200, 60),
-      onTap: () async {
-        _showCreditsDialog();
-      },
-    );
-    add(creditsButton);
   }
 
   @override
@@ -363,12 +352,16 @@ class IntroPage extends StatefulWidget {
 
 class _IntroPageState extends State<IntroPage> {
   late final IntroGame _game;
+  bool _isMuted = false; // Add mute state tracking
 
   @override
   void initState() {
     super.initState();
     _game = IntroGame(chanceShiftLogic: widget.chanceShiftLogic);
     _game.setContext(context);
+
+    // Initialize mute state
+    _isMuted = _game._audioManager.isMuted;
   }
 
   @override
@@ -382,19 +375,34 @@ class _IntroPageState extends State<IntroPage> {
               alignment: Alignment.topRight,
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
-                child: IconButton(
-                  icon: Icon(
-                    _game._audioManager.isMuted
-                        ? Icons.volume_off
-                        : Icons.volume_up,
-                    color: Colors.white,
-                    size: 32,
-                  ),
-                  onPressed: () {
-                    setState(() {
-                      _game._audioManager.toggleMute();
-                    });
-                  },
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    IconButton(
+                      icon: Icon(
+                        Icons.info_outline,
+                        color: Colors.white,
+                        size: 32,
+                      ),
+                      onPressed: () {
+                        _game._showCreditsDialog();
+                      },
+                    ),
+                    const SizedBox(width: 8),
+                    IconButton(
+                      icon: Icon(
+                        _isMuted ? Icons.volume_off : Icons.volume_up,
+                        color: Colors.white,
+                        size: 32,
+                      ),
+                      onPressed: () async {
+                        await _game._audioManager.toggleMute();
+                        setState(() {
+                          _isMuted = _game._audioManager.isMuted;
+                        });
+                      },
+                    ),
+                  ],
                 ),
               ),
             ),
